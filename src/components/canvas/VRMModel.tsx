@@ -78,8 +78,16 @@ export const VRMModel = () => {
                     const boneWorldPos = new THREE.Vector3()
                     b.getWorldPosition(boneWorldPos)
                     const dist = point.distanceTo(boneWorldPos)
-                    if (dist < minDist) {
-                        minDist = dist
+
+                    // Check if this bone is a humanoid bone
+                    const isHumanoid = getBoneName(vrm, b) !== null && Object.values(VRMHumanBoneName).includes(getBoneName(vrm, b) as any)
+
+                    // Give priority to humanoid bones by reducing their effective distance
+                    // This makes them "closer" for selection purposes than secondary bones like bust
+                    const effectiveDist = isHumanoid ? dist * 0.5 : dist
+
+                    if (effectiveDist < minDist) {
+                        minDist = effectiveDist
                         bone = b
                     }
                 }
