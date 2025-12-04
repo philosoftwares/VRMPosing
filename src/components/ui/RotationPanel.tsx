@@ -50,6 +50,11 @@ export const RotationPanel = () => {
         if (normalizedBone) {
             console.log('Setting normalized bone rotation:', selectedBoneName, newRotation)
             normalizedBone.quaternion.setFromEuler(euler)
+
+            // Special case: if rotating 'hips' (root bone), also rotate the whole model scene
+            if (selectedBoneName === VRMHumanBoneName.Hips && vrm?.scene) {
+                vrm.scene.quaternion.setFromEuler(euler)
+            }
         } else {
             // Fallback for VRM 0.0 or non-humanoid bones
             console.log('Setting raw bone rotation:', selectedBone.name, newRotation)

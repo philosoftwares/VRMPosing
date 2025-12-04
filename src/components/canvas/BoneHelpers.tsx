@@ -152,6 +152,44 @@ const BoneHelper = ({ bone, isMajor, isSelected, onClick }: BoneHelperProps) => 
         </mesh>
     )
 }
+// Bones that should be visible even if they are not major (fingers, eyes, root)
+const VISIBLE_MINOR_BONES: Set<string> = new Set([
+    'root', // VRM model root bone
+    VRMHumanBoneName.LeftEye,
+    VRMHumanBoneName.RightEye,
+    // Left Fingers
+    VRMHumanBoneName.LeftThumbMetacarpal,
+    VRMHumanBoneName.LeftThumbProximal,
+    VRMHumanBoneName.LeftThumbDistal,
+    VRMHumanBoneName.LeftIndexProximal,
+    VRMHumanBoneName.LeftIndexIntermediate,
+    VRMHumanBoneName.LeftIndexDistal,
+    VRMHumanBoneName.LeftMiddleProximal,
+    VRMHumanBoneName.LeftMiddleIntermediate,
+    VRMHumanBoneName.LeftMiddleDistal,
+    VRMHumanBoneName.LeftRingProximal,
+    VRMHumanBoneName.LeftRingIntermediate,
+    VRMHumanBoneName.LeftRingDistal,
+    VRMHumanBoneName.LeftLittleProximal,
+    VRMHumanBoneName.LeftLittleIntermediate,
+    VRMHumanBoneName.LeftLittleDistal,
+    // Right Fingers
+    VRMHumanBoneName.RightThumbMetacarpal,
+    VRMHumanBoneName.RightThumbProximal,
+    VRMHumanBoneName.RightThumbDistal,
+    VRMHumanBoneName.RightIndexProximal,
+    VRMHumanBoneName.RightIndexIntermediate,
+    VRMHumanBoneName.RightIndexDistal,
+    VRMHumanBoneName.RightMiddleProximal,
+    VRMHumanBoneName.RightMiddleIntermediate,
+    VRMHumanBoneName.RightMiddleDistal,
+    VRMHumanBoneName.RightRingProximal,
+    VRMHumanBoneName.RightRingIntermediate,
+    VRMHumanBoneName.RightRingDistal,
+    VRMHumanBoneName.RightLittleProximal,
+    VRMHumanBoneName.RightLittleIntermediate,
+    VRMHumanBoneName.RightLittleDistal,
+])
 
 export const BoneHelpers = () => {
     const vrm = useStore((state) => state.vrm)
@@ -194,15 +232,20 @@ export const BoneHelpers = () => {
 
     return (
         <group>
-            {bones.map(({ bone, name, isMajor }) => (
-                <BoneHelper
-                    key={name}
-                    bone={bone}
-                    isMajor={isMajor}
-                    isSelected={selectedBoneName === name}
-                    onClick={() => setSelectedBone(bone, name)}
-                />
-            ))}
+            {bones.map(({ bone, name, isMajor }) => {
+                // Hide non-major bones unless they are in the visible minor list (fingers, eyes)
+                if (!isMajor && !VISIBLE_MINOR_BONES.has(name)) return null
+
+                return (
+                    <BoneHelper
+                        key={name}
+                        bone={bone}
+                        isMajor={isMajor}
+                        isSelected={selectedBoneName === name}
+                        onClick={() => setSelectedBone(bone, name)}
+                    />
+                )
+            })}
         </group>
     )
 }

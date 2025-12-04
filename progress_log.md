@@ -13,27 +13,21 @@
 - [x] **Bone Dragging**:
     - Dragging bone spheres updates the bone orientation/position.
     - Uses **Raw Bones** for direct mesh manipulation (fixing the issue where only spheres moved).
+- [x] **Root Bone Rotation Fix**: Rotating 'hips' now also rotates the whole model scene.
 
 ### Visuals
 - [x] **Bone Helpers**:
     - Renders spheres at bone locations.
     - Color coding: Red (Major), Yellow (Minor), Blue (Selected/Dragging).
     - **Selection State**: Fixed issue where selection color didn't update correctly when switching bones.
-
-## Pending Re-implementation (Requested)
-
-The following features were implemented but reverted to ensure a clean base. They will be re-implemented now:
-
-1.  **Bone Visibility Filtering**:
+- [x] **Bone Visibility Filtering**:
     - Hide general minor bones (yellow spheres).
     - **Exception**: Keep Fingers and Eyes visible.
-    - Explicitly hide Bust bones (`J_Sec_...`).
-2.  **Visual Debugging**:
-    - Add `AxesHelper` (X/Y/Z lines) to the selected bone to visualize local rotation axes.
-3.  **Stability Fixes**:
-    - **Scale Lock**: Enforce scale `(1, 1, 1)` during rotation to prevent "kembang kempis" (deflating) artifacts on secondary bones.
-4.  **New Feature**:
-    - **Reset Drag Position**: Functionality to reset the position/translation of a bone.
+    - Bust bones are hidden by this filtering.
+
+## Pending Implementation
+
+- [ ] **Reset Drag Position**: Add button/mechanism to reset bone position after drag.
 
 ---
 *Last Updated: 2025-12-05*
