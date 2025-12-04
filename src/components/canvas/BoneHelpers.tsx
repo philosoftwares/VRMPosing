@@ -1,34 +1,29 @@
 import { useStore } from '../../store/useStore'
-import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useRef, useState, useCallback } from 'react'
+import { useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { VRMHumanBoneName } from '@pixiv/three-vrm'
 
 // Major bones = large spheres
 const MAJOR_BONES: Set<string> = new Set([
-    // Spine
     VRMHumanBoneName.Hips,
     VRMHumanBoneName.Spine,
     VRMHumanBoneName.Chest,
     VRMHumanBoneName.UpperChest,
     VRMHumanBoneName.Neck,
     VRMHumanBoneName.Head,
-    // Left Arm
     VRMHumanBoneName.LeftShoulder,
     VRMHumanBoneName.LeftUpperArm,
     VRMHumanBoneName.LeftLowerArm,
     VRMHumanBoneName.LeftHand,
-    // Right Arm
     VRMHumanBoneName.RightShoulder,
     VRMHumanBoneName.RightUpperArm,
     VRMHumanBoneName.RightLowerArm,
     VRMHumanBoneName.RightHand,
-    // Left Leg
     VRMHumanBoneName.LeftUpperLeg,
     VRMHumanBoneName.LeftLowerLeg,
     VRMHumanBoneName.LeftFoot,
     VRMHumanBoneName.LeftToes,
-    // Right Leg
     VRMHumanBoneName.RightUpperLeg,
     VRMHumanBoneName.RightLowerLeg,
     VRMHumanBoneName.RightFoot,
@@ -37,7 +32,6 @@ const MAJOR_BONES: Set<string> = new Set([
 
 interface BoneHelperProps {
     bone: THREE.Object3D
-    boneName: string
     isMajor: boolean
     isSelected: boolean
     onClick: () => void
@@ -46,8 +40,13 @@ interface BoneHelperProps {
 const BoneHelper = ({ bone, isMajor, isSelected, onClick }: BoneHelperProps) => {
     const meshRef = useRef<THREE.Mesh>(null)
     const size = isMajor ? 0.025 : 0.012
+    const [isDragging, setIsDragging] = useState(false)
+    const [isHovered, setIsHovered] = useState(false)
+    const dragPlaneRef = useRef<THREE.Plane>(new THREE.Plane())
+    const dragOffsetRef = useRef<THREE.Vector3>(new THREE.Vector3())
+    const { camera, raycaster, pointer } = useThree()
+    const setIsDraggingGlobal = useStore((state) => state.setIsDragging)
 
-    // Update position every frame to follow bone
     useFrame(() => {
         if (meshRef.current && bone) {
             const pos = new THREE.Vector3()
@@ -56,20 +55,97 @@ const BoneHelper = ({ bone, isMajor, isSelected, onClick }: BoneHelperProps) => 
         }
     })
 
+    const handlePointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
+        e.stopPropagation()
+        setIsDragging(true)
+        setIsDraggingGlobal(true)
+        onClick()
+
+        const boneWorldPos = new THREE.Vector3()
+        bone.getWorldPosition(boneWorldPos)
+
+        const cameraDir = new THREE.Vector3()
+        camera.getWorldDirection(cameraDir)
+        dragPlaneRef.current.setFromNormalAndCoplanarPoint(cameraDir, boneWorldPos)
+
+        raycaster.setFromCamera(pointer, camera)
+        const intersection = new THREE.Vector3()
+        raycaster.ray.intersectPlane(dragPlaneRef.current, intersection)
+        dragOffsetRef.current.subVectors(boneWorldPos, intersection)
+
+        const target = e.target as HTMLElement
+        if (target.setPointerCapture) {
+            target.setPointerCapture(e.pointerId)
+        }
+    }, [bone, onClick, camera, raycaster, pointer, setIsDraggingGlobal])
+
+    const handlePointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
+        if (!isDragging || !bone.parent) return
+
+        e.stopPropagation()
+
+        raycaster.setFromCamera(pointer, camera)
+        const targetPos = new THREE.Vector3()
+        raycaster.ray.intersectPlane(dragPlaneRef.current, targetPos)
+        targetPos.add(dragOffsetRef.current)
+
+        const parentWorldPos = new THREE.Vector3()
+        bone.parent.getWorldPosition(parentWorldPos)
+
+        const boneWorldPos = new THREE.Vector3()
+        bone.getWorldPosition(boneWorldPos)
+
+        const currentDir = new THREE.Vector3().subVectors(boneWorldPos, parentWorldPos).normalize()
+        const targetDir = new THREE.Vector3().subVectors(targetPos, parentWorldPos).normalize()
+
+        if (currentDir.dot(targetDir) > 0.9999) return
+
+        const rotationQuat = new THREE.Quaternion()
+        rotationQuat.setFromUnitVectors(currentDir, targetDir)
+
+        const parentWorldQuat = new THREE.Quaternion()
+        bone.parent.getWorldQuaternion(parentWorldQuat)
+
+        const newWorldQuat = rotationQuat.multiply(parentWorldQuat)
+
+        if (bone.parent.parent) {
+            const grandparentWorldQuat = new THREE.Quaternion()
+            bone.parent.parent.getWorldQuaternion(grandparentWorldQuat)
+            grandparentWorldQuat.invert()
+            bone.parent.quaternion.copy(newWorldQuat.premultiply(grandparentWorldQuat))
+        } else {
+            bone.parent.quaternion.copy(newWorldQuat)
+        }
+    }, [isDragging, bone, camera, raycaster, pointer])
+
+    const handlePointerUp = useCallback((e: ThreeEvent<PointerEvent>) => {
+        if (isDragging) {
+            e.stopPropagation()
+            setIsDragging(false)
+            setIsDraggingGlobal(false)
+            const target = e.target as HTMLElement
+            if (target.releasePointerCapture) {
+                target.releasePointerCapture(e.pointerId)
+            }
+        }
+    }, [isDragging, setIsDraggingGlobal])
+
     return (
         <mesh
             ref={meshRef}
             renderOrder={999}
-            onClick={(e) => {
-                e.stopPropagation()
-                onClick()
-            }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerOver={() => setIsHovered(true)}
+            onPointerOut={() => setIsHovered(false)}
+            scale={isHovered || isDragging ? 1.3 : 1}
         >
             <sphereGeometry args={[size, 16, 16]} />
             <meshBasicMaterial
-                color={isSelected ? '#00ff88' : isMajor ? '#ff6b6b' : '#ffd93d'}
+                color={isDragging ? '#00aaff' : isSelected ? '#00ff88' : isMajor ? '#ff6b6b' : '#ffd93d'}
                 transparent
-                opacity={isSelected ? 0.95 : 0.7}
+                opacity={isDragging ? 1 : isSelected ? 0.95 : 0.7}
                 depthTest={false}
                 depthWrite={false}
             />
@@ -103,7 +179,6 @@ export const BoneHelpers = () => {
                 <BoneHelper
                     key={name}
                     bone={bone}
-                    boneName={name}
                     isMajor={isMajor}
                     isSelected={selectedBone === bone}
                     onClick={() => setSelectedBone(bone, name)}

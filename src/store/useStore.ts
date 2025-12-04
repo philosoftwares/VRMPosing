@@ -8,6 +8,8 @@ interface AppState {
     selectedBone: THREE.Object3D | null
     selectedBoneName: string | null
     setSelectedBone: (bone: THREE.Object3D | null, name: string | null) => void
+    isDragging: boolean
+    setIsDragging: (isDragging: boolean) => void
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -16,4 +18,6 @@ export const useStore = create<AppState>((set) => ({
     selectedBone: null,
     selectedBoneName: null,
     setSelectedBone: (bone, name) => set({ selectedBone: bone, selectedBoneName: name }),
+    isDragging: false,
+    setIsDragging: (isDragging) => set({ isDragging }),
 }))

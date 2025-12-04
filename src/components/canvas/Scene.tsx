@@ -4,11 +4,9 @@ import { VRMModel } from './VRMModel'
 import { BoneGizmo } from './BoneGizmo'
 import { BoneHelpers } from './BoneHelpers'
 import { useStore } from '../../store/useStore'
-import { useRef } from 'react'
 
 export const Scene = () => {
-    const selectedBone = useStore((state) => state.selectedBone)
-    const orbitRef = useRef<any>(null)
+    const isDragging = useStore((state) => state.isDragging)
 
     return (
         <Canvas camera={{ position: [0, 1.5, 2], fov: 50 }}>
@@ -17,10 +15,9 @@ export const Scene = () => {
             <directionalLight position={[1, 1, 1]} intensity={1} />
             <Grid infiniteGrid sectionColor="#444" cellColor="#222" fadeDistance={20} />
             <OrbitControls
-                ref={orbitRef}
                 makeDefault
                 target={[0, 1, 0]}
-                enabled={!selectedBone || true}
+                enabled={!isDragging}
             />
             <VRMModel />
             <BoneHelpers />
