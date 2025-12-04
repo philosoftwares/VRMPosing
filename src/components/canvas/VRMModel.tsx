@@ -16,8 +16,10 @@ const getBoneName = (vrm: ReturnType<typeof useStore.getState>['vrm'], bone: THR
     if (!vrm) return null
 
     for (const boneName of Object.values(VRMHumanBoneName)) {
-        const humanBone = vrm.humanoid?.getNormalizedBoneNode(boneName)
-        if (humanBone === bone) {
+        // Check both normalized and raw bones
+        const normalizedBone = vrm.humanoid?.getNormalizedBoneNode(boneName)
+        const rawBone = vrm.humanoid?.getRawBoneNode(boneName)
+        if (normalizedBone === bone || rawBone === bone) {
             return boneName
         }
     }
