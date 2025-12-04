@@ -1,18 +1,97 @@
 import { useStore } from '../../store/useStore'
+import { useEffect, useRef } from 'react'
+import { useThree, useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
+import { VRMHumanBoneName } from '@pixiv/three-vrm'
 
-import { useEffect } from 'react'
+// Helper to find bone from clicked mesh
+const findParentBone = (object: THREE.Object3D | null): THREE.Object3D | null => {
+    if (!object) return null
+    if (object.userData?.isBone || object.type === 'Bone') return object
+    return findParentBone(object.parent)
+}
+
+// Get bone name from VRM humanoid
+const getBoneName = (vrm: ReturnType<typeof useStore.getState>['vrm'], bone: THREE.Object3D): string | null => {
+    if (!vrm) return null
+
+    for (const boneName of Object.values(VRMHumanBoneName)) {
+        const humanBone = vrm.humanoid?.getNormalizedBoneNode(boneName)
+        if (humanBone === bone) {
+            return boneName
+        }
+    }
+    return bone.name || null
+}
 
 export const VRMModel = () => {
     const vrm = useStore((state) => state.vrm)
+    const setSelectedBone = useStore((state) => state.setSelectedBone)
+    const groupRef = useRef<THREE.Group>(null)
+    const { raycaster, camera, pointer } = useThree()
 
     useEffect(() => {
         if (vrm) {
-            // Cleanup or initial setup if needed
             console.log('VRM Model mounted', vrm)
         }
     }, [vrm])
 
+    // Update VRM every frame to apply bone rotations to the mesh
+    useFrame((_, delta) => {
+        if (vrm) {
+            vrm.update(delta)
+        }
+    })
+
+    const handleClick = (e: THREE.Event & { stopPropagation: () => void }) => {
+        e.stopPropagation()
+
+        if (!vrm) return
+
+        // Raycast to find clicked object
+        raycaster.setFromCamera(pointer, camera)
+        const intersects = raycaster.intersectObject(vrm.scene, true)
+
+        if (intersects.length > 0) {
+            const clickedObject = intersects[0].object
+
+            // Find nearest bone
+            let bone: THREE.Object3D | null = null
+
+            // If clicked on SkinnedMesh, find nearest bone from skeleton
+            if (clickedObject instanceof THREE.SkinnedMesh && clickedObject.skeleton) {
+                const skeleton = clickedObject.skeleton
+                const point = intersects[0].point
+
+                let minDist = Infinity
+                for (const b of skeleton.bones) {
+                    const boneWorldPos = new THREE.Vector3()
+                    b.getWorldPosition(boneWorldPos)
+                    const dist = point.distanceTo(boneWorldPos)
+                    if (dist < minDist) {
+                        minDist = dist
+                        bone = b
+                    }
+                }
+            } else {
+                bone = findParentBone(clickedObject)
+            }
+
+            if (bone) {
+                const boneName = getBoneName(vrm, bone)
+                console.log('Selected bone:', boneName, bone)
+                setSelectedBone(bone, boneName)
+            }
+        }
+    }
+
     if (!vrm) return null
 
-    return <primitive object={vrm.scene} />
+    return (
+        <primitive
+            ref={groupRef}
+            object={vrm.scene}
+            onClick={handleClick}
+        />
+    )
 }
