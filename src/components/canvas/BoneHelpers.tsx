@@ -143,7 +143,7 @@ const BoneHelper = ({ bone, isMajor, isSelected, onClick }: BoneHelperProps) => 
         >
             <sphereGeometry args={[size, 16, 16]} />
             <meshBasicMaterial
-                color={isDragging ? '#00aaff' : isSelected ? '#00ff88' : isMajor ? '#ff6b6b' : '#ffd93d'}
+                color={(isDragging || isSelected) ? '#00aaff' : isMajor ? '#ff6b6b' : '#ffd93d'}
                 transparent
                 opacity={isDragging ? 1 : isSelected ? 0.95 : 0.7}
                 depthTest={false}
@@ -155,15 +155,18 @@ const BoneHelper = ({ bone, isMajor, isSelected, onClick }: BoneHelperProps) => 
 
 export const BoneHelpers = () => {
     const vrm = useStore((state) => state.vrm)
-    const selectedBone = useStore((state) => state.selectedBone)
+    const selectedBoneName = useStore((state) => state.selectedBoneName)
     const setSelectedBone = useStore((state) => state.setSelectedBone)
 
     if (!vrm?.humanoid) return null
 
     const bones: { bone: THREE.Object3D; name: string; isMajor: boolean }[] = []
 
+    // First, add bones from VRMHumanBoneName (using normalized if available, otherwise raw)
     for (const boneName of Object.values(VRMHumanBoneName)) {
-        const boneNode = vrm.humanoid.getNormalizedBoneNode(boneName)
+        const normalizedBone = vrm.humanoid.getNormalizedBoneNode(boneName)
+        const rawBone = vrm.humanoid.getRawBoneNode(boneName)
+        const boneNode = normalizedBone || rawBone
         if (boneNode) {
             bones.push({
                 bone: boneNode,
@@ -173,6 +176,22 @@ export const BoneHelpers = () => {
         }
     }
 
+    // Then, traverse the whole scene to find any additional bones not covered above (e.g., J_Sec_L_Bust1/2)
+    const existingNames = new Set(bones.map((b) => b.name))
+    vrm.scene.traverse((obj) => {
+        if ((obj as any).isBone) {
+            const name = obj.name
+            if (!existingNames.has(name) && name) {
+                bones.push({
+                    bone: obj,
+                    name,
+                    isMajor: false,
+                })
+                existingNames.add(name)
+            }
+        }
+    })
+
     return (
         <group>
             {bones.map(({ bone, name, isMajor }) => (
@@ -180,7 +199,7 @@ export const BoneHelpers = () => {
                     key={name}
                     bone={bone}
                     isMajor={isMajor}
-                    isSelected={selectedBone === bone}
+                    isSelected={selectedBoneName === name}
                     onClick={() => setSelectedBone(bone, name)}
                 />
             ))}

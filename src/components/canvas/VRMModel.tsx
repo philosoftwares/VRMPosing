@@ -41,7 +41,15 @@ export const VRMModel = () => {
     // Update VRM every frame to apply bone rotations to the mesh
     useFrame((_, delta) => {
         if (vrm) {
-            vrm.update(delta)
+            // vrm.update(delta) // Decomposed below to control what updates
+
+            vrm.humanoid?.update()
+            vrm.lookAt?.update(delta)
+            vrm.expressionManager?.update()
+
+            // Disable spring bone manager to prevent it from overwriting manual bone rotations
+            // This is crucial for posing secondary bones like Bust/Hair manually
+            // vrm.springBoneManager?.update(delta) 
         }
     })
 
