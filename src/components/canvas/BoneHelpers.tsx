@@ -55,6 +55,18 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
     // Reuse Vector3 for position updates to avoid garbage collection
     const posRef = useRef<THREE.Vector3>(new THREE.Vector3())
 
+    // Reuse objects for drag calculations to reduce GC
+    const dragCalcRefs = useRef({
+        targetPos: new THREE.Vector3(),
+        parentWorldPos: new THREE.Vector3(),
+        boneWorldPos: new THREE.Vector3(),
+        currentDir: new THREE.Vector3(),
+        targetDir: new THREE.Vector3(),
+        rotationQuat: new THREE.Quaternion(),
+        parentWorldQuat: new THREE.Quaternion(),
+        grandparentWorldQuat: new THREE.Quaternion(),
+    })
+
     useFrame(() => {
         if (meshRef.current && bone) {
             bone.getWorldPosition(posRef.current)
@@ -70,7 +82,7 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
             setIsDragging(false)
             setTimeout(() => {
                 setIsDraggingGlobal(false)
-            }, 50)
+            }, 30)
         }
 
         window.addEventListener('pointerup', handleGlobalPointerUp)
@@ -115,47 +127,40 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
 
         e.stopPropagation()
 
+        const calc = dragCalcRefs.current
+
         raycaster.setFromCamera(pointer, camera)
-        const targetPos = new THREE.Vector3()
-        raycaster.ray.intersectPlane(dragPlaneRef.current, targetPos)
-        targetPos.add(dragOffsetRef.current)
+        raycaster.ray.intersectPlane(dragPlaneRef.current, calc.targetPos)
+        calc.targetPos.add(dragOffsetRef.current)
 
         // Special handling for Root bone: TRANSLATE vrm.scene position instead of rotating
         if (boneName === 'Root' && vrm?.scene) {
-            // Simply move the scene to follow the target position
-            vrm.scene.position.copy(targetPos)
+            vrm.scene.position.copy(calc.targetPos)
             return
         }
 
         // Normal bone drag: rotate parent
         if (!bone.parent) return
 
-        const parentWorldPos = new THREE.Vector3()
-        bone.parent.getWorldPosition(parentWorldPos)
+        bone.parent.getWorldPosition(calc.parentWorldPos)
+        bone.getWorldPosition(calc.boneWorldPos)
 
-        const boneWorldPos = new THREE.Vector3()
-        bone.getWorldPosition(boneWorldPos)
+        calc.currentDir.subVectors(calc.boneWorldPos, calc.parentWorldPos).normalize()
+        calc.targetDir.subVectors(calc.targetPos, calc.parentWorldPos).normalize()
 
-        const currentDir = new THREE.Vector3().subVectors(boneWorldPos, parentWorldPos).normalize()
-        const targetDir = new THREE.Vector3().subVectors(targetPos, parentWorldPos).normalize()
+        if (calc.currentDir.dot(calc.targetDir) > 0.9999) return
 
-        if (currentDir.dot(targetDir) > 0.9999) return
+        calc.rotationQuat.setFromUnitVectors(calc.currentDir, calc.targetDir)
+        bone.parent.getWorldQuaternion(calc.parentWorldQuat)
 
-        const rotationQuat = new THREE.Quaternion()
-        rotationQuat.setFromUnitVectors(currentDir, targetDir)
-
-        const parentWorldQuat = new THREE.Quaternion()
-        bone.parent.getWorldQuaternion(parentWorldQuat)
-
-        const newWorldQuat = rotationQuat.multiply(parentWorldQuat)
+        calc.rotationQuat.multiply(calc.parentWorldQuat)
 
         if (bone.parent.parent) {
-            const grandparentWorldQuat = new THREE.Quaternion()
-            bone.parent.parent.getWorldQuaternion(grandparentWorldQuat)
-            grandparentWorldQuat.invert()
-            bone.parent.quaternion.copy(newWorldQuat.premultiply(grandparentWorldQuat))
+            bone.parent.parent.getWorldQuaternion(calc.grandparentWorldQuat)
+            calc.grandparentWorldQuat.invert()
+            bone.parent.quaternion.copy(calc.rotationQuat.premultiply(calc.grandparentWorldQuat))
         } else {
-            bone.parent.quaternion.copy(newWorldQuat)
+            bone.parent.quaternion.copy(calc.rotationQuat)
         }
     }, [isDragging, bone, boneName, vrm, camera, raycaster, pointer])
 
@@ -166,7 +171,7 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
             // Delay resetting global dragging state to prevent OrbitControls from catching stray events
             setTimeout(() => {
                 setIsDraggingGlobal(false)
-            }, 50)
+            }, 30)
             const target = e.target as HTMLElement
             if (target.releasePointerCapture) {
                 target.releasePointerCapture(e.pointerId)

@@ -22,6 +22,8 @@ export const Scene = () => {
                 makeDefault
                 target={[0, 1, 0]}
                 enabled={!isDragging}
+                zoomSpeed={2}
+                enableDamping={false}
             />
             <VRMModel />
             <BoneHelpers />
