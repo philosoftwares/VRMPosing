@@ -1,5 +1,5 @@
 import { useStore } from '../../store/useStore'
-import { useRef, useState, useCallback, useMemo } from 'react'
+import { useRef, useState, useCallback, useMemo, useEffect } from 'react'
 import { useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { VRMHumanBoneName } from '@pixiv/three-vrm'
@@ -62,8 +62,32 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
         }
     })
 
+    // Global pointerup listener to ensure drag stops even if pointer leaves element
+    useEffect(() => {
+        if (!isDragging) return
+
+        const handleGlobalPointerUp = () => {
+            setIsDragging(false)
+            setTimeout(() => {
+                setIsDraggingGlobal(false)
+            }, 50)
+        }
+
+        window.addEventListener('pointerup', handleGlobalPointerUp)
+        window.addEventListener('pointercancel', handleGlobalPointerUp)
+
+        return () => {
+            window.removeEventListener('pointerup', handleGlobalPointerUp)
+            window.removeEventListener('pointercancel', handleGlobalPointerUp)
+        }
+    }, [isDragging, setIsDraggingGlobal])
+
     const handlePointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation()
+        // Stop event completely to prevent OrbitControls from receiving it
+        if (e.nativeEvent) {
+            e.nativeEvent.stopImmediatePropagation()
+        }
         setIsDragging(true)
         setIsDraggingGlobal(true)
         onClick()
@@ -139,10 +163,10 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
         if (isDragging) {
             e.stopPropagation()
             setIsDragging(false)
-            // Delay resetting global dragging state to prevent VRMModel from processing the click
+            // Delay resetting global dragging state to prevent OrbitControls from catching stray events
             setTimeout(() => {
                 setIsDraggingGlobal(false)
-            }, 100)
+            }, 50)
             const target = e.target as HTMLElement
             if (target.releasePointerCapture) {
                 target.releasePointerCapture(e.pointerId)

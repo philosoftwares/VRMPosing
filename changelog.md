@@ -3,20 +3,25 @@
 ## 2025-12-05 - Session 2
 
 ### Performance Optimizations
-- Removed all debug `console.log` statements (8 total across files)
-- Optimized `useFrame` in BoneHelper to reuse Vector3 object
-- Memoized bone collection with `useMemo` to avoid recalculation every render
-- Reduced sphere geometry from 16×16 to 12×12 segments (~44% less faces)
-- Fixed React hooks order violation in BoneHelpers
+- Removed all debug `console.log` statements (8 total)
+- Optimized `useFrame` to reuse Vector3 object
+- Memoized bone collection with `useMemo`
+- Reduced sphere geometry from 16×16 to 12×12 segments
+
+### Interaction Fixes
+- Added global pointerup listener for reliable drag stop
+- Added `stopImmediatePropagation` to prevent OrbitControls conflict
+- Tuned drag release delay to 50ms for responsive viewport
 
 ### Features
-- **Root Bone Drag**: Drag on Root bone now moves model position (translation)
-- **Reset Drag for Root**: Only resets position (0,0,0), not rotation
-- **Bone Sphere Sizes**: Hand bones (0.015), Finger bones (0.006) for better selection
+- **Root Bone Drag**: Translates model position
+- **Reset Drag for Root**: Only resets position, not rotation
+- **Bone Sphere Sizes**: Hand (0.015), Finger (0.006) for better selection
 
 ### Bug Fixes
-- Fixed selection changing when releasing mouse after clicking bone sphere (100ms delay)
+- Fixed selection changing on mouse release (delay mechanism)
 - Fixed hand bones overlapping with thumb metacarpal
+- Fixed React hooks order violation in BoneHelpers
 
 
 ## 2025-12-05 - Session 1
