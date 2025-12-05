@@ -5,7 +5,7 @@
 ### Core Functionality
 - [x] **VRM 1.0 Support**: Normalized bone rotations with proper propagation
 - [x] **Bone Selection**: Priority for humanoid bones, 30ms delay fix
-- [x] **Rotation Panel**: Local & Global rotation sliders
+- [x] **Rotation Panel**: Local & Global rotation sliders (bottom-right)
 - [x] **Bone Dragging**: IK-like rotation, Root bone translates model
 - [x] **Root Bone**: Slider rotates `vrm.scene`, drag moves position
 
@@ -13,7 +13,13 @@
 - [x] **Local Rotation**: Spring-back sliders, rotate around bone's current local axis
 - [x] **Global Rotation**: World-space rotation with parent quaternion compensation
 - [x] **Euler Display**: Read-only X°/Y°/Z° display for reference
-- [x] **Reset Buttons**: Reset Rotation, Reset Drag
+- [x] **Reset Buttons**: Reset Rotation, Reset Drag (per bone)
+
+### Reset All Panel (bottom-left)
+- [x] **All (Keep Pos)**: Reset all + rotasi Root, tapi bukan posisi
+- [x] **All (Keep Rot)**: Reset all + posisi Root, tapi bukan rotasi
+- [x] **All (Keep Root)**: Reset semua bone kecuali Root
+- [x] **All + Root**: Reset SEMUA termasuk Root
 
 ### Visuals
 - [x] **Sphere Sizes**: Major (0.025), Hand (0.015), Minor (0.012), Finger (0.006)
@@ -32,6 +38,7 @@
 - [x] Reduced sphere polygon count
 
 ---
-*Last Updated: 2025-12-05 20:36*
+*Last Updated: 2025-12-05 21:24*
+
 
 

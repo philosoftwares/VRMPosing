@@ -1,5 +1,26 @@
 # Changelog
 
+## 2025-12-05 - Session 6
+
+### Reset All Buttons
+- **New Component**: `ResetAllPanel.tsx` - separate panel for reset all functions
+- **4 Reset Buttons**:
+  - `All (Keep Pos)` - Reset all bones + rotasi Root, tapi bukan posisi
+  - `All (Keep Rot)` - Reset all bones + posisi Root, tapi bukan rotasi
+  - `All (Keep Root)` - Reset semua bone kecuali Root
+  - `All + Root` - Reset SEMUA termasuk Root (warna merah)
+- **VRM 0.0 Fix**: Reset root rotation now properly resets Hips bone
+
+### UI Layout Changes
+- **ResetAllPanel**: Positioned at bottom-left
+- **RotationPanel**: Moved to bottom-right
+
+### Technical Changes
+- `ResetAllPanel.tsx`: New component with VRM version detection
+- `App.tsx`: Added ResetAllPanel import
+- `RotationPanel.tsx`: Moved to right side, removed duplicate reset all code
+
+
 ## 2025-12-05 - Session 5
 
 ### Local Rotation Slider Fix

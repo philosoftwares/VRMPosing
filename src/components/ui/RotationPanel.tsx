@@ -170,7 +170,7 @@ export const RotationPanel = () => {
     if (!selectedBone || !selectedBoneName) return null
 
     return (
-        <div className="absolute bottom-4 left-4 p-4 bg-black/90 backdrop-blur-sm rounded-lg shadow-lg z-10 w-80">
+        <div className="absolute bottom-4 right-4 p-4 bg-black/90 backdrop-blur-sm rounded-lg shadow-lg z-10 w-80">
             <div className="flex items-center justify-between mb-3">
                 <div>
                     <p className="text-xs text-gray-400">Selected Bone</p>
