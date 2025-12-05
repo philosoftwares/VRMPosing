@@ -124,7 +124,10 @@ const BoneHelper = ({ bone, isMajor, isFinger, isSelected, onClick }: BoneHelper
         if (isDragging) {
             e.stopPropagation()
             setIsDragging(false)
-            setIsDraggingGlobal(false)
+            // Delay resetting global dragging state to prevent VRMModel from processing the click
+            setTimeout(() => {
+                setIsDraggingGlobal(false)
+            }, 100)
             const target = e.target as HTMLElement
             if (target.releasePointerCapture) {
                 target.releasePointerCapture(e.pointerId)

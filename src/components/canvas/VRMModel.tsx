@@ -53,6 +53,10 @@ export const VRMModel = () => {
 
         if (!vrm) return
 
+        // Don't process clicks if we just finished dragging a bone sphere
+        const isDragging = useStore.getState().isDragging
+        if (isDragging) return
+
         raycaster.setFromCamera(pointer, camera)
         const intersects = raycaster.intersectObject(vrm.scene, true)
 
