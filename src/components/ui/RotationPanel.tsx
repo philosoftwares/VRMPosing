@@ -102,7 +102,6 @@ export const RotationPanel = () => {
 
         if (selectedBoneName === 'Root' && vrm?.scene) {
             vrm.scene.quaternion.premultiply(deltaQuat)
-            // Update initial quaternion so local rotation stays consistent
             initialQuat.current.copy(vrm.scene.quaternion)
             updateEulerDisplay()
             return
@@ -111,7 +110,24 @@ export const RotationPanel = () => {
         const normalizedBone = getNormalizedBone()
         const targetBone = normalizedBone || selectedBone
 
-        targetBone.quaternion.premultiply(deltaQuat)
+        // Get current world quaternion
+        const worldQuat = new THREE.Quaternion()
+        targetBone.getWorldQuaternion(worldQuat)
+
+        // Apply world rotation: newWorld = delta * currentWorld
+        const newWorldQuat = deltaQuat.clone().multiply(worldQuat)
+
+        // Convert back to local space
+        if (targetBone.parent) {
+            const parentWorldQuat = new THREE.Quaternion()
+            targetBone.parent.getWorldQuaternion(parentWorldQuat)
+            // localQuat = inverse(parentWorld) * newWorld
+            const parentInverse = parentWorldQuat.clone().invert()
+            targetBone.quaternion.copy(parentInverse.multiply(newWorldQuat))
+        } else {
+            targetBone.quaternion.copy(newWorldQuat)
+        }
+
         updateEulerDisplay()
     }
 

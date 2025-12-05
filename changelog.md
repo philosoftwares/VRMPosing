@@ -10,6 +10,12 @@
   - 3x sensitivity for responsive control
   - Uses `quaternion.multiply()` for local-space rotation
 
+### World Rotation Fix
+- **Issue**: World rotation didn't follow gizmo ring path for bones with parents
+- **Fix**: Proper world-space rotation with parent quaternion compensation
+  - Get world quaternion → apply world delta → convert back to local
+  - Rotation now exactly follows the fixed world gizmo ring
+
 ### UI Changes
 - **Euler Display**: Read-only display showing current X/Y/Z Euler angles
 - **Local Sliders**: Changed from absolute (-180° to 180°) to relative (-15 to 15)
@@ -17,9 +23,9 @@
 ### Technical Changes
 - `RotationPanel.tsx`:
   - Added `handleLocalRotationChange()` using `quaternion.multiply(deltaQuat)`
+  - Fixed `handleGlobalRotationChange()` with proper world→local conversion
   - Added `eulerDisplay` state for read-only angle display
   - Added `localSlider` state with spring-back behavior
-  - Updated `updateEulerDisplay()` function
 
 
 ## 2025-12-05 - Session 4

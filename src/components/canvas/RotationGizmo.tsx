@@ -17,7 +17,7 @@ export const RotationGizmo = () => {
                 // Position at scene origin
                 ringRef.current.position.copy(vrm.scene.position)
 
-                // For global, use world orientation
+                // For global, use world orientation (fixed)
                 if (hoveredAxis?.startsWith('global')) {
                     ringRef.current.quaternion.set(0, 0, 0, 1)
                     if (hoveredAxis === 'globalX') {
@@ -40,7 +40,7 @@ export const RotationGizmo = () => {
             // Normal bone: position at bone's world position
             selectedBone.getWorldPosition(ringRef.current.position)
 
-            // For local axes, also copy the bone's world rotation
+            // For local axes, copy the bone's world rotation
             if (hoveredAxis?.startsWith('local')) {
                 selectedBone.getWorldQuaternion(ringRef.current.quaternion)
 
@@ -50,7 +50,7 @@ export const RotationGizmo = () => {
                     ringRef.current.rotateX(Math.PI / 2)
                 }
             } else {
-                // For global axes, use world orientation
+                // For global axes, use world orientation (fixed)
                 ringRef.current.quaternion.set(0, 0, 0, 1)
 
                 if (hoveredAxis === 'globalX') {
