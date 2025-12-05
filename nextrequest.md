@@ -1,4 +1,6 @@
 request:
-- reset position untuk fungsi drag
-- hapus warna kuning untuk major join
-- bone root, ketika dirotasi, hanya mengubah bone, tidak mengubah model
+- fitur khusus mata: gizmo yang diterapkan untuk kedua mata
+- fitur khusus jari: 
+    - gizmo untuk mengatur keseluruhan jari tangan kiri: menggenggam dan terbuka lebar
+    - gizmo untuk mengatur keseluruhan jari tangan kanan: menggenggam dan terbuka lebar
+- global dan local gizmo

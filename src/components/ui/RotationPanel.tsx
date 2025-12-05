@@ -109,8 +109,9 @@ export const RotationPanel = () => {
             }
         }
 
-        // Also reset vrm.scene for Root bone
+        // Also reset vrm.scene for Root bone (both position and rotation)
         if (selectedBoneName === 'Root' && vrm?.scene) {
+            vrm.scene.position.set(0, 0, 0)
             vrm.scene.quaternion.set(0, 0, 0, 1)
         }
 

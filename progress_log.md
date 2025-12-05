@@ -6,15 +6,17 @@
 - [x] **VRM 1.0 Support**: Handles normalized bone rotations with proper propagation to raw bones.
 - [x] **Bone Selection**:
     - Raycasting for bone selection via model click.
-    - **Priority Fix**: Humanoid bones prioritized over secondary bones (e.g., Bust).
+    - **Priority Fix**: Humanoid bones prioritized over secondary bones.
     - **Click Fix**: 100ms delay prevents accidental re-selection on mouse release.
 - [x] **Rotation Panel**:
     - X, Y, Z slider controls.
     - Real-time sync with selected bone.
     - Reset Rotation button.
     - Reset Drag button.
-- [x] **Bone Dragging**: IK-like rotation drag on bone spheres.
-- [x] **Root Bone Rotation**: Rotating 'Root' or 'hips' rotates the entire model.
+- [x] **Bone Dragging**:
+    - IK-like rotation drag on bone spheres.
+    - **Root bone drag**: Moves model position (translation).
+- [x] **Root Bone Rotation**: Slider rotation on 'Root' rotates `vrm.scene`.
 
 ### Visuals
 - [x] **Bone Helpers**:
@@ -29,4 +31,4 @@
 - [x] Hand bones don't overlap with thumb metacarpal.
 
 ---
-*Last Updated: 2025-12-05 08:11*
+*Last Updated: 2025-12-05 08:29*
