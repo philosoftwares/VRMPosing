@@ -4,6 +4,7 @@ import { VRMHumanBoneName } from '@pixiv/three-vrm'
 export const ResetAllPanel = () => {
     const vrm = useStore((state) => state.vrm)
     const initialSceneQuat = useStore((state) => state.initialSceneQuat)
+    const saveSnapshot = useStore((state) => state.saveSnapshot)
 
     if (!vrm) return null
 
@@ -47,10 +48,10 @@ export const ResetAllPanel = () => {
     }
 
     // 4 Reset All variants
-    const resetAllExceptRoot = () => resetAllBones({ resetRootRotation: false, resetRootDrag: false })
-    const resetAllExceptRootDrag = () => resetAllBones({ resetRootRotation: true, resetRootDrag: false })
-    const resetAllExceptRootRotation = () => resetAllBones({ resetRootRotation: false, resetRootDrag: true })
-    const resetAllIncludingRoot = () => resetAllBones({ resetRootRotation: true, resetRootDrag: true })
+    const resetAllExceptRoot = () => { resetAllBones({ resetRootRotation: false, resetRootDrag: false }); saveSnapshot() }
+    const resetAllExceptRootDrag = () => { resetAllBones({ resetRootRotation: true, resetRootDrag: false }); saveSnapshot() }
+    const resetAllExceptRootRotation = () => { resetAllBones({ resetRootRotation: false, resetRootDrag: true }); saveSnapshot() }
+    const resetAllIncludingRoot = () => { resetAllBones({ resetRootRotation: true, resetRootDrag: true }); saveSnapshot() }
 
     return (
         <div className="absolute bottom-4 left-4 p-3 bg-black/90 backdrop-blur-sm rounded-lg shadow-lg z-10">

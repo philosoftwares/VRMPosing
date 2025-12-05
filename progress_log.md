@@ -31,6 +31,12 @@
 - [x] **Zoom Speed**: 2x faster scroll zoom
 - [x] **No Damping**: Viewport stops immediately on mouse release
 
+### Undo/Redo System
+- [x] **Unlimited History**: All actions saved as snapshots
+- [x] **Keyboard Shortcuts**: Ctrl+Z (undo), Ctrl+Y (redo)
+- [x] **UI Buttons**: Undo/Redo buttons with disabled state
+- [x] **Action Counter**: Shows 0/0 initially, increments per action
+
 ### Performance Optimizations
 - [x] Removed debug console.log statements
 - [x] Reuse Vector3/Quaternion in drag calculations
@@ -38,7 +44,4 @@
 - [x] Reduced sphere polygon count
 
 ---
-*Last Updated: 2025-12-05 21:24*
-
-
-
+*Last Updated: 2025-12-05 21:55*

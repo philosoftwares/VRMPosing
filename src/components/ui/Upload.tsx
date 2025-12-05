@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react'
 
 export const Upload = () => {
     const setVrm = useStore((state) => state.setVrm)
+    const setVrmFileName = useStore((state) => state.setVrmFileName)
     const [loading, setLoading] = useState(false)
     const [progress, setProgress] = useState(0)
 
@@ -28,6 +29,7 @@ export const Upload = () => {
                 VRMUtils.rotateVRM0(vrm)
 
                 setVrm(vrm)
+                setVrmFileName(file.name)
                 console.log('VRM loaded', vrm)
                 setLoading(false)
             },
@@ -41,7 +43,7 @@ export const Upload = () => {
                 alert('Error loading VRM file')
             }
         )
-    }, [setVrm])
+    }, [setVrm, setVrmFileName])
 
     const onDrop = (e: React.DragEvent) => {
         e.preventDefault()

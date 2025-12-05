@@ -1,5 +1,23 @@
 # Changelog
 
+## 2025-12-05 - Session 7
+
+### Undo/Redo System
+- **HistoryPanel**: New component with Undo/Redo buttons and keyboard shortcuts (Ctrl+Z/Y)
+- **Snapshot System**: Captures all bone rotations and root position/rotation
+- **History Counter**: Shows action count (0/0 initially, increments per action)
+
+### Bug Fixes
+- **Fixed**: Reset Rotation and Reset Drag buttons now save to history
+- **Fixed**: Duplicate snapshot on bone drag (was counting 2 for 1 drag)
+- **Fixed**: Corrupted BoneHelpers.tsx from interrupted edit
+
+### Files Changed
+- `useStore.ts`: Added history state, saveSnapshot, undo, redo, canUndo, canRedo
+- `HistoryPanel.tsx`: New component for undo/redo UI
+- `BoneHelpers.tsx`: Fixed global pointer handler, single saveSnapshot on drag end
+- `RotationPanel.tsx`: Added saveSnapshot to reset buttons
+
 ## 2025-12-05 - Session 6
 
 ### Reset All Buttons

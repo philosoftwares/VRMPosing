@@ -10,6 +10,7 @@ export const RotationPanel = () => {
     const setSelectedBone = useStore((state) => state.setSelectedBone)
     const setHoveredAxis = useStore((state) => state.setHoveredAxis)
     const initialSceneQuat = useStore((state) => state.initialSceneQuat)
+    const saveSnapshot = useStore((state) => state.saveSnapshot)
 
     // Current Euler angles (read-only display)
     const [eulerDisplay, setEulerDisplay] = useState({ x: 0, y: 0, z: 0 })
@@ -198,7 +199,7 @@ export const RotationPanel = () => {
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={localSlider.x}
                             onChange={(e) => { const val = parseFloat(e.target.value); setLocalSlider(p => ({ ...p, x: val })); if (val !== 0) handleLocalRotationChange('x', val - localSlider.x) }}
-                            onPointerUp={() => setLocalSlider(p => ({ ...p, x: 0 }))}
+                            onPointerUp={() => { setLocalSlider(p => ({ ...p, x: 0 })); saveSnapshot() }}
                             onMouseEnter={() => setHoveredAxis('localX')} onMouseLeave={() => setHoveredAxis(null)}
                             className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-500" />
                     </div>
@@ -208,7 +209,7 @@ export const RotationPanel = () => {
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={localSlider.y}
                             onChange={(e) => { const val = parseFloat(e.target.value); setLocalSlider(p => ({ ...p, y: val })); if (val !== 0) handleLocalRotationChange('y', val - localSlider.y) }}
-                            onPointerUp={() => setLocalSlider(p => ({ ...p, y: 0 }))}
+                            onPointerUp={() => { setLocalSlider(p => ({ ...p, y: 0 })); saveSnapshot() }}
                             onMouseEnter={() => setHoveredAxis('localY')} onMouseLeave={() => setHoveredAxis(null)}
                             className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500" />
                     </div>
@@ -218,7 +219,7 @@ export const RotationPanel = () => {
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={localSlider.z}
                             onChange={(e) => { const val = parseFloat(e.target.value); setLocalSlider(p => ({ ...p, z: val })); if (val !== 0) handleLocalRotationChange('z', val - localSlider.z) }}
-                            onPointerUp={() => setLocalSlider(p => ({ ...p, z: 0 }))}
+                            onPointerUp={() => { setLocalSlider(p => ({ ...p, z: 0 })); saveSnapshot() }}
                             onMouseEnter={() => setHoveredAxis('localZ')} onMouseLeave={() => setHoveredAxis(null)}
                             className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500" />
                     </div>
@@ -234,7 +235,7 @@ export const RotationPanel = () => {
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={globalSlider.x}
                             onChange={(e) => { const val = parseFloat(e.target.value); setGlobalSlider(p => ({ ...p, x: val })); if (val !== 0) handleGlobalRotationChange('x', val - globalSlider.x) }}
-                            onPointerUp={() => setGlobalSlider(p => ({ ...p, x: 0 }))}
+                            onPointerUp={() => { setGlobalSlider(p => ({ ...p, x: 0 })); saveSnapshot() }}
                             onMouseEnter={() => setHoveredAxis('globalX')} onMouseLeave={() => setHoveredAxis(null)}
                             className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-300" />
                     </div>
@@ -244,7 +245,7 @@ export const RotationPanel = () => {
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={globalSlider.y}
                             onChange={(e) => { const val = parseFloat(e.target.value); setGlobalSlider(p => ({ ...p, y: val })); if (val !== 0) handleGlobalRotationChange('y', val - globalSlider.y) }}
-                            onPointerUp={() => setGlobalSlider(p => ({ ...p, y: 0 }))}
+                            onPointerUp={() => { setGlobalSlider(p => ({ ...p, y: 0 })); saveSnapshot() }}
                             onMouseEnter={() => setHoveredAxis('globalY')} onMouseLeave={() => setHoveredAxis(null)}
                             className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-300" />
                     </div>
@@ -254,7 +255,7 @@ export const RotationPanel = () => {
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={globalSlider.z}
                             onChange={(e) => { const val = parseFloat(e.target.value); setGlobalSlider(p => ({ ...p, z: val })); if (val !== 0) handleGlobalRotationChange('z', val - globalSlider.z) }}
-                            onPointerUp={() => setGlobalSlider(p => ({ ...p, z: 0 }))}
+                            onPointerUp={() => { setGlobalSlider(p => ({ ...p, z: 0 })); saveSnapshot() }}
                             onMouseEnter={() => setHoveredAxis('globalZ')} onMouseLeave={() => setHoveredAxis(null)}
                             className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-300" />
                     </div>
@@ -262,8 +263,8 @@ export const RotationPanel = () => {
             </div>
 
             <div className="flex gap-2">
-                <button onClick={resetRotation} className="flex-1 px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded">Reset Rotation</button>
-                <button onClick={resetDrag} className="flex-1 px-3 py-2 text-xs bg-orange-700 hover:bg-orange-600 text-white rounded">Reset Drag</button>
+                <button onClick={() => { resetRotation(); saveSnapshot() }} className="flex-1 px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded">Reset Rotation</button>
+                <button onClick={() => { resetDrag(); saveSnapshot() }} className="flex-1 px-3 py-2 text-xs bg-orange-700 hover:bg-orange-600 text-white rounded">Reset Drag</button>
             </div>
         </div>
     )

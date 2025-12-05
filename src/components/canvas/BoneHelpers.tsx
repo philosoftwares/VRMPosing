@@ -51,6 +51,7 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
     const { camera, raycaster, pointer } = useThree()
     const setIsDraggingGlobal = useStore((state) => state.setIsDragging)
     const vrm = useStore((state) => state.vrm)
+    const saveSnapshot = useStore((state) => state.saveSnapshot)
 
     // Reuse Vector3 for position updates to avoid garbage collection
     const posRef = useRef<THREE.Vector3>(new THREE.Vector3())
@@ -74,25 +75,27 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
         }
     })
 
-    // Global pointerup listener to ensure drag stops even if pointer leaves element
-    useEffect(() => {
-        if (!isDragging) return
-
-        const handleGlobalPointerUp = () => {
+    // Global pointer up listener for reliable drag stop (backup handler)
+    // Note: saveSnapshot is called in handlePointerUp, not here, to avoid duplicates
+    const handleGlobalPointerUp = useCallback(() => {
+        if (isDragging) {
             setIsDragging(false)
             setTimeout(() => {
                 setIsDraggingGlobal(false)
             }, 30)
         }
+    }, [isDragging, setIsDraggingGlobal])
 
-        window.addEventListener('pointerup', handleGlobalPointerUp)
-        window.addEventListener('pointercancel', handleGlobalPointerUp)
-
+    useEffect(() => {
+        if (isDragging) {
+            window.addEventListener('pointerup', handleGlobalPointerUp)
+            window.addEventListener('pointercancel', handleGlobalPointerUp)
+        }
         return () => {
             window.removeEventListener('pointerup', handleGlobalPointerUp)
             window.removeEventListener('pointercancel', handleGlobalPointerUp)
         }
-    }, [isDragging, setIsDraggingGlobal])
+    }, [isDragging, handleGlobalPointerUp])
 
     const handlePointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation()
@@ -168,6 +171,7 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
         if (isDragging) {
             e.stopPropagation()
             setIsDragging(false)
+            saveSnapshot()
             // Delay resetting global dragging state to prevent OrbitControls from catching stray events
             setTimeout(() => {
                 setIsDraggingGlobal(false)
@@ -177,7 +181,7 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
                 target.releasePointerCapture(e.pointerId)
             }
         }
-    }, [isDragging, setIsDraggingGlobal])
+    }, [isDragging, setIsDraggingGlobal, saveSnapshot])
 
     return (
         <mesh
