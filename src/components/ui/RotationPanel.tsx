@@ -79,6 +79,43 @@ export const RotationPanel = () => {
         } else {
             selectedBone.quaternion.set(0, 0, 0, 1)
         }
+
+        // Also reset vrm.scene for Root/Hips
+        if ((selectedBoneName === 'Root' || selectedBoneName === VRMHumanBoneName.Hips) && vrm?.scene) {
+            vrm.scene.quaternion.set(0, 0, 0, 1)
+        }
+    }
+
+    const resetDrag = () => {
+        if (!selectedBone) return
+
+        console.log('Reset Drag for:', selectedBoneName, selectedBone.name)
+
+        // Reset the selected bone's quaternion
+        selectedBone.quaternion.set(0, 0, 0, 1)
+
+        // Reset the parent bone's rotation (which is what drag affects)
+        if (selectedBone.parent) {
+            console.log('Resetting parent:', selectedBone.parent.name)
+            selectedBone.parent.quaternion.set(0, 0, 0, 1)
+        }
+
+        // For normalized bones, also reset the normalized bone
+        const normalizedBone = getNormalizedBone()
+        if (normalizedBone && normalizedBone !== selectedBone) {
+            normalizedBone.quaternion.set(0, 0, 0, 1)
+            if (normalizedBone.parent) {
+                normalizedBone.parent.quaternion.set(0, 0, 0, 1)
+            }
+        }
+
+        // Also reset vrm.scene for Root bone
+        if (selectedBoneName === 'Root' && vrm?.scene) {
+            vrm.scene.quaternion.set(0, 0, 0, 1)
+        }
+
+        // Sync rotation state
+        setRotation({ x: 0, y: 0, z: 0 })
     }
 
     if (!selectedBone || !selectedBoneName) return null
@@ -151,12 +188,20 @@ export const RotationPanel = () => {
                 </div>
             </div>
 
-            <button
-                onClick={resetRotation}
-                className="mt-3 w-full px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
-            >
-                Reset Rotation
-            </button>
+            <div className="mt-3 flex gap-2">
+                <button
+                    onClick={resetRotation}
+                    className="flex-1 px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                >
+                    Reset Rotation
+                </button>
+                <button
+                    onClick={resetDrag}
+                    className="flex-1 px-3 py-2 text-xs bg-orange-700 hover:bg-orange-600 text-white rounded transition-colors"
+                >
+                    Reset Drag
+                </button>
+            </div>
         </div>
     )
 }
