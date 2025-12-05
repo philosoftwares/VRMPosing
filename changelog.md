@@ -1,5 +1,14 @@
 # Changelog
 
+## 2025-12-05 - Session 3
+
+### Features
+- **Global Rotation Sliders**: Added World X/Y/Z sliders for world-space rotation
+  - Sliders follow mouse during drag
+  - Spring-back to center (0) on release
+  - 3x sensitivity multiplier for responsive control
+
+
 ## 2025-12-05 - Session 2
 
 ### Performance Optimizations
@@ -21,11 +30,6 @@
 - **Root Bone Drag**: Translates model position
 - **Reset Drag for Root**: Only resets position, not rotation
 - **Bone Sphere Sizes**: Hand (0.015), Finger (0.006)
-
-### Bug Fixes
-- Fixed selection changing on mouse release
-- Fixed hand bones overlapping with thumb
-- Fixed React hooks order violation
 
 
 ## 2025-12-05 - Session 1
