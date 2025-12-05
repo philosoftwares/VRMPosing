@@ -34,14 +34,15 @@ interface BoneHelperProps {
     bone: THREE.Object3D
     isMajor: boolean
     isFinger: boolean
+    isHand: boolean
     isSelected: boolean
     onClick: () => void
 }
 
-const BoneHelper = ({ bone, isMajor, isFinger, isSelected, onClick }: BoneHelperProps) => {
+const BoneHelper = ({ bone, isMajor, isFinger, isHand, isSelected, onClick }: BoneHelperProps) => {
     const meshRef = useRef<THREE.Mesh>(null)
-    // Finger bones are smaller (0.006), minor bones (0.012), major bones (0.025)
-    const size = isMajor ? 0.025 : isFinger ? 0.006 : 0.012
+    // Hand bones are smaller (0.015) to avoid overlap with thumb, finger bones (0.006), minor bones (0.012), major bones (0.025)
+    const size = isHand ? 0.015 : isMajor ? 0.025 : isFinger ? 0.006 : 0.012
     const [isDragging, setIsDragging] = useState(false)
     const [isHovered, setIsHovered] = useState(false)
     const dragPlaneRef = useRef<THREE.Plane>(new THREE.Plane())
@@ -203,13 +204,18 @@ export const BoneHelpers = () => {
 
     if (!vrm?.humanoid) return null
 
-    const bones: { bone: THREE.Object3D; name: string; isMajor: boolean; isFinger: boolean }[] = []
+    const bones: { bone: THREE.Object3D; name: string; isMajor: boolean; isFinger: boolean; isHand: boolean }[] = []
 
     // Check if a bone name is a finger bone
     const isFingerBone = (name: string) => {
         return name.includes('Thumb') || name.includes('Index') ||
             name.includes('Middle') || name.includes('Ring') ||
             name.includes('Little')
+    }
+
+    // Check if a bone is a hand bone
+    const isHandBone = (name: string) => {
+        return name === VRMHumanBoneName.LeftHand || name === VRMHumanBoneName.RightHand
     }
 
     // First, add bones from VRMHumanBoneName (using normalized if available, otherwise raw)
@@ -223,6 +229,7 @@ export const BoneHelpers = () => {
                 name: boneName,
                 isMajor: MAJOR_BONES.has(boneName),
                 isFinger: isFingerBone(boneName),
+                isHand: isHandBone(boneName),
             })
         }
     }
@@ -239,6 +246,7 @@ export const BoneHelpers = () => {
                     name,
                     isMajor: false,
                     isFinger: isFingerBone(name),
+                    isHand: false,
                 })
                 existingNames.add(name)
             }
@@ -247,7 +255,7 @@ export const BoneHelpers = () => {
 
     return (
         <group>
-            {bones.map(({ bone, name, isMajor, isFinger }) => {
+            {bones.map(({ bone, name, isMajor, isFinger, isHand }) => {
                 // Hide non-major bones unless they are in the visible minor list (fingers, eyes)
                 if (!isMajor && !VISIBLE_MINOR_BONES.has(name)) return null
 
@@ -257,6 +265,7 @@ export const BoneHelpers = () => {
                         bone={bone}
                         isMajor={isMajor}
                         isFinger={isFinger}
+                        isHand={isHand}
                         isSelected={selectedBoneName === name}
                         onClick={() => setSelectedBone(bone, name)}
                     />
