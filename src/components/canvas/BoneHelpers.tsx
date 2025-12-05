@@ -52,11 +52,13 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
     const setIsDraggingGlobal = useStore((state) => state.setIsDragging)
     const vrm = useStore((state) => state.vrm)
 
+    // Reuse Vector3 for position updates to avoid garbage collection
+    const posRef = useRef<THREE.Vector3>(new THREE.Vector3())
+
     useFrame(() => {
         if (meshRef.current && bone) {
-            const pos = new THREE.Vector3()
-            bone.getWorldPosition(pos)
-            meshRef.current.position.copy(pos)
+            bone.getWorldPosition(posRef.current)
+            meshRef.current.position.copy(posRef.current)
         }
     })
 
@@ -251,7 +253,6 @@ export const BoneHelpers = () => {
     vrm.scene.traverse((obj) => {
         if ((obj as any).isBone) {
             const name = obj.name
-            console.log('Found bone:', name) // Debug: show all bone names
             if (!existingNames.has(name) && name) {
                 bones.push({
                     bone: obj,

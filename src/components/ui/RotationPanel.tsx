@@ -48,7 +48,6 @@ export const RotationPanel = () => {
         // For VRM 1.0: apply to normalized bone, vrm.update() will propagate to raw bone
         const normalizedBone = getNormalizedBone()
         if (normalizedBone) {
-            console.log('Setting normalized bone rotation:', selectedBoneName, newRotation)
             normalizedBone.quaternion.setFromEuler(euler)
 
             // Special case: if rotating 'hips' (root bone), also rotate the whole model scene
@@ -57,7 +56,6 @@ export const RotationPanel = () => {
             }
         } else {
             // Fallback for VRM 0.0 or non-humanoid bones
-            console.log('Setting raw bone rotation:', selectedBone.name, newRotation)
 
             // Special case: if rotating 'Root' bone, ONLY rotate the whole model scene (not the bone itself)
             if (selectedBoneName === 'Root' && vrm?.scene) {
@@ -89,8 +87,6 @@ export const RotationPanel = () => {
     const resetDrag = () => {
         if (!selectedBone) return
 
-        console.log('Reset Drag for:', selectedBoneName, selectedBone.name)
-
         // Special case for Root bone: only reset position, not rotation
         if (selectedBoneName === 'Root' && vrm?.scene) {
             vrm.scene.position.set(0, 0, 0)
@@ -102,7 +98,6 @@ export const RotationPanel = () => {
 
         // Reset the parent bone's rotation (which is what drag affects)
         if (selectedBone.parent) {
-            console.log('Resetting parent:', selectedBone.parent.name)
             selectedBone.parent.quaternion.set(0, 0, 0, 1)
         }
 

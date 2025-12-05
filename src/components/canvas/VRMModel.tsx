@@ -33,9 +33,7 @@ export const VRMModel = () => {
     const { raycaster, camera, pointer } = useThree()
 
     useEffect(() => {
-        if (vrm) {
-            console.log('VRM Model mounted', vrm)
-        }
+        // VRM model mounted
     }, [vrm])
 
     // Update VRM every frame to apply bone rotations to the mesh
@@ -88,7 +86,6 @@ export const VRMModel = () => {
 
             if (bone) {
                 const boneName = getBoneName(vrm, bone)
-                console.log('Selected bone:', boneName, bone)
                 setSelectedBone(bone, boneName)
             }
         }
