@@ -4,6 +4,9 @@ import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm'
 import { useCallback, useState } from 'react'
 
 export const Upload = () => {
+    const vrm = useStore((state) => state.vrm)
+    const vrmFileName = useStore((state) => state.vrmFileName)
+    const isVRM1 = useStore((state) => state.isVRM1)
     const setVrm = useStore((state) => state.setVrm)
     const setVrmFileName = useStore((state) => state.setVrmFileName)
     const [loading, setLoading] = useState(false)
@@ -30,12 +33,10 @@ export const Upload = () => {
 
                 setVrm(vrm)
                 setVrmFileName(file.name)
-                console.log('VRM loaded', vrm)
                 setLoading(false)
             },
             (xhr: ProgressEvent) => {
                 setProgress(100.0 * (xhr.loaded / xhr.total))
-                console.log('Loading...', 100.0 * (xhr.loaded / xhr.total), '%')
             },
             (error: unknown) => {
                 console.error(error)
@@ -54,23 +55,38 @@ export const Upload = () => {
     const onDragOver = (e: React.DragEvent) => e.preventDefault()
 
     return (
-        <div
-            className="absolute top-4 left-4 p-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg z-10 w-64"
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-        >
-            <h2 className="text-lg font-bold mb-2 text-gray-800">VRM Viewer</h2>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
-                <input
-                    type="file"
-                    accept=".vrm"
-                    onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <p className="text-sm text-gray-500">
-                    {loading ? `Loading... ${Math.round(progress)}%` : 'Drag & Drop VRM or Click to Upload'}
-                </p>
+        <div className="absolute top-4 left-4 flex items-start gap-3 z-10">
+            {/* Upload Panel */}
+            <div
+                className="p-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg w-64"
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+            >
+                <h2 className="text-lg font-bold mb-2 text-gray-800">VRM Viewer</h2>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
+                    <input
+                        type="file"
+                        accept=".vrm"
+                        onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <p className="text-sm text-gray-500">
+                        {loading ? `Loading... ${Math.round(progress)}%` : 'Drag & Drop VRM or Click to Upload'}
+                    </p>
+                </div>
             </div>
+
+            {/* Model Info (text only, no panel) */}
+            {vrm && (
+                <div className="pt-2 text-xs">
+                    <p className="text-gray-300 truncate max-w-40" title={vrmFileName || ''}>
+                        📁 {vrmFileName || 'Unknown'}
+                    </p>
+                    <p className="text-gray-500">
+                        VRM {isVRM1 ? '1.0' : '0.x'}
+                    </p>
+                </div>
+            )}
         </div>
     )
 }

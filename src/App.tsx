@@ -3,6 +3,7 @@ import { Upload } from './components/ui/Upload'
 import { RotationPanel } from './components/ui/RotationPanel'
 import { ResetAllPanel } from './components/ui/ResetAllPanel'
 import { HistoryPanel } from './components/ui/HistoryPanel'
+import { DragPanel } from './components/ui/DragPanel'
 
 function App() {
     return (
@@ -10,6 +11,7 @@ function App() {
             <Upload />
             <HistoryPanel />
             <ResetAllPanel />
+            <DragPanel />
             <RotationPanel />
             <Scene />
         </div>
@@ -17,5 +19,3 @@ function App() {
 }
 
 export default App
-
-

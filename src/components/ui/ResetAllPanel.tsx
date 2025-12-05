@@ -54,7 +54,7 @@ export const ResetAllPanel = () => {
     const resetAllIncludingRoot = () => { resetAllBones({ resetRootRotation: true, resetRootDrag: true }); saveSnapshot() }
 
     return (
-        <div className="absolute bottom-4 left-4 p-3 bg-black/90 backdrop-blur-sm rounded-lg shadow-lg z-10">
+        <div className="absolute bottom-4 right-4 p-3 bg-black/90 backdrop-blur-sm rounded-lg shadow-lg z-10">
             <p className="text-xs text-gray-500 mb-2 font-medium">RESET ALL BONES</p>
             <div className="grid grid-cols-2 gap-2 w-56">
                 <button onClick={resetAllExceptRootDrag} className="px-2 py-2 text-xs bg-purple-700 hover:bg-purple-600 text-white rounded" title="Reset semua + rotasi Root, tapi bukan posisi">

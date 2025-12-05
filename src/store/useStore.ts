@@ -2,7 +2,8 @@ import { create } from 'zustand'
 import { VRM, VRMHumanBoneName } from '@pixiv/three-vrm'
 import * as THREE from 'three'
 
-type AxisType = 'localX' | 'localY' | 'localZ' | 'globalX' | 'globalY' | 'globalZ' | null
+type AxisType = 'localX' | 'localY' | 'localZ' | 'globalX' | 'globalY' | 'globalZ' |
+    'localDragX' | 'localDragY' | 'localDragZ' | 'worldDragX' | 'worldDragY' | 'worldDragZ' | null
 
 // Snapshot of all bone rotations
 interface PoseSnapshot {
@@ -65,14 +66,21 @@ const applySnapshot = (vrm: VRM, snapshot: PoseSnapshot) => {
 
 export const useStore = create<AppState>((set, get) => ({
     vrm: null,
-    setVrm: (vrm) => set({
-        vrm,
-        selectedBone: null,
-        selectedBoneName: null,
-        isVRM1: vrm?.meta && 'metaVersion' in vrm.meta ? true : false,
-        history: vrm ? [createSnapshot(vrm)] : [],
-        historyIndex: 0
-    }),
+    setVrm: (vrm) => {
+        // VRM 1.0 has meta.metaVersion === '1', VRM 0.x has different meta structure
+        const isVRM1 = vrm?.meta ? (
+            'metaVersion' in vrm.meta && vrm.meta.metaVersion === '1'
+        ) : false
+
+        set({
+            vrm,
+            selectedBone: null,
+            selectedBoneName: null,
+            isVRM1,
+            history: vrm ? [createSnapshot(vrm)] : [],
+            historyIndex: 0
+        })
+    },
     vrmFileName: null,
     setVrmFileName: (vrmFileName) => set({ vrmFileName }),
     isVRM1: false,
