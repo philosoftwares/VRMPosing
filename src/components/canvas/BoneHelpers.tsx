@@ -32,6 +32,7 @@ const MAJOR_BONES: Set<string> = new Set([
 
 interface BoneHelperProps {
     bone: THREE.Object3D
+    boneName: string
     isMajor: boolean
     isFinger: boolean
     isHand: boolean
@@ -39,7 +40,7 @@ interface BoneHelperProps {
     onClick: () => void
 }
 
-const BoneHelper = ({ bone, isMajor, isFinger, isHand, isSelected, onClick }: BoneHelperProps) => {
+const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onClick }: BoneHelperProps) => {
     const meshRef = useRef<THREE.Mesh>(null)
     // Hand bones are smaller (0.015) to avoid overlap with thumb, finger bones (0.006), minor bones (0.012), major bones (0.025)
     const size = isHand ? 0.015 : isMajor ? 0.025 : isFinger ? 0.006 : 0.012
@@ -49,6 +50,7 @@ const BoneHelper = ({ bone, isMajor, isFinger, isHand, isSelected, onClick }: Bo
     const dragOffsetRef = useRef<THREE.Vector3>(new THREE.Vector3())
     const { camera, raycaster, pointer } = useThree()
     const setIsDraggingGlobal = useStore((state) => state.setIsDragging)
+    const vrm = useStore((state) => state.vrm)
 
     useFrame(() => {
         if (meshRef.current && bone) {
@@ -83,7 +85,7 @@ const BoneHelper = ({ bone, isMajor, isFinger, isHand, isSelected, onClick }: Bo
     }, [bone, onClick, camera, raycaster, pointer, setIsDraggingGlobal])
 
     const handlePointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
-        if (!isDragging || !bone.parent) return
+        if (!isDragging) return
 
         e.stopPropagation()
 
@@ -91,6 +93,16 @@ const BoneHelper = ({ bone, isMajor, isFinger, isHand, isSelected, onClick }: Bo
         const targetPos = new THREE.Vector3()
         raycaster.ray.intersectPlane(dragPlaneRef.current, targetPos)
         targetPos.add(dragOffsetRef.current)
+
+        // Special handling for Root bone: TRANSLATE vrm.scene position instead of rotating
+        if (boneName === 'Root' && vrm?.scene) {
+            // Simply move the scene to follow the target position
+            vrm.scene.position.copy(targetPos)
+            return
+        }
+
+        // Normal bone drag: rotate parent
+        if (!bone.parent) return
 
         const parentWorldPos = new THREE.Vector3()
         bone.parent.getWorldPosition(parentWorldPos)
@@ -119,7 +131,7 @@ const BoneHelper = ({ bone, isMajor, isFinger, isHand, isSelected, onClick }: Bo
         } else {
             bone.parent.quaternion.copy(newWorldQuat)
         }
-    }, [isDragging, bone, camera, raycaster, pointer])
+    }, [isDragging, bone, boneName, vrm, camera, raycaster, pointer])
 
     const handlePointerUp = useCallback((e: ThreeEvent<PointerEvent>) => {
         if (isDragging) {
@@ -263,6 +275,7 @@ export const BoneHelpers = () => {
                     <BoneHelper
                         key={name}
                         bone={bone}
+                        boneName={name}
                         isMajor={isMajor}
                         isFinger={isFinger}
                         isHand={isHand}
