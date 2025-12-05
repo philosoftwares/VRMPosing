@@ -37,12 +37,19 @@
 - [x] **Colors**: Red (Major), Yellow (Minor), Blue (Selected)
 - [x] **Rotation Gizmo**: Ring for rotation, lines for drag
 
+### Camera Panel (bottom-right, next to Reset All)
+- [x] **Focus**: Pan to model, keep current viewing angle, default distance
+- [x] **Reset Position**: Reset distance, keep viewing angle
+- [x] **Reset Rotation**: Orbit to front view (+Z), keep distance
+- [x] **Reset All**: Reset both to defaults
+
 ### UI Layout
 - [x] **Upload Panel**: Top-left with model info beside it
 - [x] **Undo/Redo**: Below Upload panel
 - [x] **Rotation Panel**: Top-right (scrollable)
 - [x] **Drag Panel**: Bottom-left
 - [x] **Reset All**: Bottom-right
+- [x] **Camera Panel**: Next to Reset All
 
 ---
-*Last Updated: 2025-12-06 04:31*
+*Last Updated: 2025-12-06 06:00*

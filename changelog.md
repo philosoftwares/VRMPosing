@@ -20,6 +20,13 @@
 - **Rotation Panel**: Top-right (scrollable)
 - **Drag Panel**: Bottom-left
 - **Reset All Panel**: Bottom-right
+- **Camera Panel**: Next to Reset All (horizontal layout)
+
+### Camera Panel
+- **Focus**: Pan to center on model, keeps current viewing angle, default distance
+- **Reset Position**: Reset to default distance, keep viewing angle
+- **Reset Rotation**: Orbit to front view (+Z), keep distance
+- **Reset All**: Reset position and rotation to defaults
 
 ### Bug Fixes
 - **VRM Version Detection**: Fixed to check `metaVersion === '1'` specifically

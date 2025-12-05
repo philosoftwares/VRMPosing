@@ -27,6 +27,14 @@ interface AppState {
     setIsDragging: (isDragging: boolean) => void
     hoveredAxis: AxisType
     setHoveredAxis: (axis: AxisType) => void
+    // Camera controls
+    cameraResetCallbacks: {
+        focusToModel?: () => void
+        resetPosition?: () => void
+        resetRotation?: () => void
+        resetAll?: () => void
+    }
+    setCameraResetCallbacks: (callbacks: AppState['cameraResetCallbacks']) => void
     // History for undo/redo
     history: PoseSnapshot[]
     historyIndex: number
@@ -93,6 +101,9 @@ export const useStore = create<AppState>((set, get) => ({
     setIsDragging: (isDragging) => set({ isDragging }),
     hoveredAxis: null,
     setHoveredAxis: (hoveredAxis) => set({ hoveredAxis }),
+    // Camera reset
+    cameraResetCallbacks: {},
+    setCameraResetCallbacks: (callbacks) => set({ cameraResetCallbacks: callbacks }),
     // History
     history: [],
     historyIndex: -1,
