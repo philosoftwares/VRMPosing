@@ -41,15 +41,10 @@ export const VRMModel = () => {
     // Update VRM every frame to apply bone rotations to the mesh
     useFrame((_, delta) => {
         if (vrm) {
-            // vrm.update(delta) // Decomposed below to control what updates
-
             vrm.humanoid?.update()
             vrm.lookAt?.update(delta)
             vrm.expressionManager?.update()
-
-            // Disable spring bone manager to prevent it from overwriting manual bone rotations
-            // This is crucial for posing secondary bones like Bust/Hair manually
-            // vrm.springBoneManager?.update(delta) 
+            // vrm.springBoneManager?.update(delta) // Disabled for manual posing
         }
     })
 
@@ -58,17 +53,13 @@ export const VRMModel = () => {
 
         if (!vrm) return
 
-        // Raycast to find clicked object
         raycaster.setFromCamera(pointer, camera)
         const intersects = raycaster.intersectObject(vrm.scene, true)
 
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object
-
-            // Find nearest bone
             let bone: THREE.Object3D | null = null
 
-            // If clicked on SkinnedMesh, find nearest bone from skeleton
             if (clickedObject instanceof THREE.SkinnedMesh && clickedObject.skeleton) {
                 const skeleton = clickedObject.skeleton
                 const point = intersects[0].point
@@ -79,11 +70,7 @@ export const VRMModel = () => {
                     b.getWorldPosition(boneWorldPos)
                     const dist = point.distanceTo(boneWorldPos)
 
-                    // Check if this bone is a humanoid bone
                     const isHumanoid = getBoneName(vrm, b) !== null && Object.values(VRMHumanBoneName).includes(getBoneName(vrm, b) as any)
-
-                    // Give priority to humanoid bones by reducing their effective distance
-                    // This makes them "closer" for selection purposes than secondary bones like bust
                     const effectiveDist = isHumanoid ? dist * 0.5 : dist
 
                     if (effectiveDist < minDist) {
