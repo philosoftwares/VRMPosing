@@ -12,7 +12,7 @@
     - X, Y, Z slider controls.
     - Real-time sync with selected bone.
     - Reset Rotation button.
-    - Reset Drag button.
+    - Reset Drag button (position only for Root, quaternion for others).
 - [x] **Bone Dragging**:
     - IK-like rotation drag on bone spheres.
     - **Root bone drag**: Moves model position (translation).
@@ -29,6 +29,7 @@
 ### Bug Fixes
 - [x] Selection doesn't change when releasing mouse after clicking sphere.
 - [x] Hand bones don't overlap with thumb metacarpal.
+- [x] Reset Drag for Root only resets position, not rotation.
 
 ---
-*Last Updated: 2025-12-05 08:29*
+*Last Updated: 2025-12-05 08:52*
