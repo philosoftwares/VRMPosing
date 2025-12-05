@@ -1,5 +1,27 @@
 # Changelog
 
+## 2025-12-05 - Session 5
+
+### Local Rotation Slider Fix
+- **Issue**: Local X/Y/Z sliders didn't match gizmo visual after rotating other axes
+- **Fix**: Changed from Euler angle sliders to incremental local-axis rotation
+  - Sliders now rotate around bone's **current local axis** (matches gizmo ring)
+  - Spring-back to 0 on release (like global sliders)
+  - 3x sensitivity for responsive control
+  - Uses `quaternion.multiply()` for local-space rotation
+
+### UI Changes
+- **Euler Display**: Read-only display showing current X/Y/Z Euler angles
+- **Local Sliders**: Changed from absolute (-180° to 180°) to relative (-15 to 15)
+
+### Technical Changes
+- `RotationPanel.tsx`:
+  - Added `handleLocalRotationChange()` using `quaternion.multiply(deltaQuat)`
+  - Added `eulerDisplay` state for read-only angle display
+  - Added `localSlider` state with spring-back behavior
+  - Updated `updateEulerDisplay()` function
+
+
 ## 2025-12-05 - Session 4
 
 ### VRM 0.0 Root Bone Fixes

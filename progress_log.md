@@ -10,14 +10,16 @@
 - [x] **Root Bone**: Slider rotates `vrm.scene`, drag moves position
 
 ### Rotation Controls
-- [x] **Local Rotation**: X/Y/Z sliders (-180° to 180°) in bone space
+- [x] **Local Rotation**: Spring-back sliders, rotate around bone's local axis
 - [x] **Global Rotation**: World X/Y/Z sliders with spring-back behavior
+- [x] **Euler Display**: Read-only X°/Y°/Z° display for reference
 - [x] **Reset Buttons**: Reset Rotation, Reset Drag
 
 ### Visuals
 - [x] **Sphere Sizes**: Major (0.025), Hand (0.015), Minor (0.012), Finger (0.006)
 - [x] **Sphere Segments**: 12×12 (optimized)
 - [x] **Colors**: Red (Major), Yellow (Minor), Blue (Selected/Dragging)
+- [x] **Rotation Gizmo**: Shows local/global axis ring on slider hover
 
 ### Viewport Controls
 - [x] **Zoom Speed**: 2x faster scroll zoom
@@ -30,4 +32,5 @@
 - [x] Reduced sphere polygon count
 
 ---
-*Last Updated: 2025-12-05 18:22*
+*Last Updated: 2025-12-05 20:17*
+

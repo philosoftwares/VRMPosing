@@ -11,7 +11,10 @@ export const RotationPanel = () => {
     const setHoveredAxis = useStore((state) => state.setHoveredAxis)
     const initialSceneQuat = useStore((state) => state.initialSceneQuat)
 
-    const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 })
+    // Current Euler angles (read-only display)
+    const [eulerDisplay, setEulerDisplay] = useState({ x: 0, y: 0, z: 0 })
+    // Local slider values (spring-back to 0)
+    const [localSlider, setLocalSlider] = useState({ x: 0, y: 0, z: 0 })
     const [globalSlider, setGlobalSlider] = useState({ x: 0, y: 0, z: 0 })
 
     // Store initial quaternion when Root bone is selected
@@ -22,11 +25,15 @@ export const RotationPanel = () => {
         return vrm.humanoid?.getNormalizedBoneNode(selectedBoneName as VRMHumanBoneName)
     }
 
-    useEffect(() => {
-        // For Root bone: store initial quaternion and show (0,0,0)
+    // Update Euler display when bone changes or after rotation
+    const updateEulerDisplay = () => {
         if (selectedBoneName === 'Root' && vrm?.scene) {
-            initialQuat.current.copy(vrm.scene.quaternion)
-            setRotation({ x: 0, y: 0, z: 0 })
+            const euler = new THREE.Euler().setFromQuaternion(vrm.scene.quaternion, 'XYZ')
+            setEulerDisplay({
+                x: THREE.MathUtils.radToDeg(euler.x),
+                y: THREE.MathUtils.radToDeg(euler.y),
+                z: THREE.MathUtils.radToDeg(euler.z),
+            })
             return
         }
 
@@ -35,50 +42,52 @@ export const RotationPanel = () => {
 
         if (boneToRead) {
             const euler = new THREE.Euler().setFromQuaternion(boneToRead.quaternion, 'XYZ')
-            setRotation({
+            setEulerDisplay({
                 x: THREE.MathUtils.radToDeg(euler.x),
                 y: THREE.MathUtils.radToDeg(euler.y),
                 z: THREE.MathUtils.radToDeg(euler.z),
             })
         }
+    }
+
+    useEffect(() => {
+        // Store initial quaternion for Root
+        if (selectedBoneName === 'Root' && vrm?.scene) {
+            initialQuat.current.copy(vrm.scene.quaternion)
+        }
+        // Reset sliders when bone changes
+        setLocalSlider({ x: 0, y: 0, z: 0 })
+        updateEulerDisplay()
     }, [selectedBone, selectedBoneName, vrm])
 
-    const handleRotationChange = (axis: 'x' | 'y' | 'z', value: number) => {
+    // Handle local rotation - incremental around current local axis
+    const handleLocalRotationChange = (axis: 'x' | 'y' | 'z', deltaDeg: number) => {
         if (!selectedBone) return
 
-        const newRotation = { ...rotation, [axis]: value }
-        setRotation(newRotation)
+        const deltaRad = THREE.MathUtils.degToRad(deltaDeg * 3) // 3x sensitivity
 
-        // For Root bone: apply rotation relative to initial quaternion
+        // Local axis in bone's local space
+        const localAxis = axis === 'x' ? new THREE.Vector3(1, 0, 0) :
+            axis === 'y' ? new THREE.Vector3(0, 1, 0) :
+                new THREE.Vector3(0, 0, 1)
+
+        const deltaQuat = new THREE.Quaternion().setFromAxisAngle(localAxis, deltaRad)
+
         if (selectedBoneName === 'Root' && vrm?.scene) {
-            const deltaEuler = new THREE.Euler(
-                THREE.MathUtils.degToRad(newRotation.x),
-                THREE.MathUtils.degToRad(newRotation.y),
-                THREE.MathUtils.degToRad(newRotation.z),
-                'XYZ'
-            )
-            const deltaQuat = new THREE.Quaternion().setFromEuler(deltaEuler)
-            // Final = initial * delta
-            vrm.scene.quaternion.copy(initialQuat.current).multiply(deltaQuat)
+            // For Root: multiply (local rotation)
+            vrm.scene.quaternion.multiply(deltaQuat)
+            initialQuat.current.copy(vrm.scene.quaternion)
+            updateEulerDisplay()
             return
         }
 
-        const euler = new THREE.Euler(
-            THREE.MathUtils.degToRad(newRotation.x),
-            THREE.MathUtils.degToRad(newRotation.y),
-            THREE.MathUtils.degToRad(newRotation.z),
-            'XYZ'
-        )
-
         const normalizedBone = getNormalizedBone()
-        if (normalizedBone) {
-            normalizedBone.quaternion.setFromEuler(euler)
-            if (selectedBoneName === VRMHumanBoneName.Hips && vrm?.scene) {
-                vrm.scene.quaternion.setFromEuler(euler)
-            }
-        } else {
-            selectedBone.quaternion.setFromEuler(euler)
-        }
+        const targetBone = normalizedBone || selectedBone
+
+        // multiply for local-space rotation (rotates around bone's own axis)
+        targetBone.quaternion.multiply(deltaQuat)
+
+        updateEulerDisplay()
     }
 
     const handleGlobalRotationChange = (axis: 'x' | 'y' | 'z', deltaDeg: number) => {
@@ -95,7 +104,7 @@ export const RotationPanel = () => {
             vrm.scene.quaternion.premultiply(deltaQuat)
             // Update initial quaternion so local rotation stays consistent
             initialQuat.current.copy(vrm.scene.quaternion)
-            setRotation({ x: 0, y: 0, z: 0 })
+            updateEulerDisplay()
             return
         }
 
@@ -103,13 +112,7 @@ export const RotationPanel = () => {
         const targetBone = normalizedBone || selectedBone
 
         targetBone.quaternion.premultiply(deltaQuat)
-
-        const euler = new THREE.Euler().setFromQuaternion(targetBone.quaternion, 'XYZ')
-        setRotation({
-            x: THREE.MathUtils.radToDeg(euler.x),
-            y: THREE.MathUtils.radToDeg(euler.y),
-            z: THREE.MathUtils.radToDeg(euler.z),
-        })
+        updateEulerDisplay()
     }
 
     const resetRotation = () => {
@@ -119,17 +122,17 @@ export const RotationPanel = () => {
             // Reset to initial rotation (what it was when VRM loaded)
             vrm.scene.quaternion.copy(initialSceneQuat)
             initialQuat.current.copy(vrm.scene.quaternion)
-            setRotation({ x: 0, y: 0, z: 0 })
+            updateEulerDisplay()
             return
         }
 
-        setRotation({ x: 0, y: 0, z: 0 })
         const normalizedBone = getNormalizedBone()
         if (normalizedBone) {
             normalizedBone.quaternion.set(0, 0, 0, 1)
         } else {
             selectedBone.quaternion.set(0, 0, 0, 1)
         }
+        updateEulerDisplay()
     }
 
     const resetDrag = () => {
@@ -145,7 +148,7 @@ export const RotationPanel = () => {
             normalizedBone.quaternion.set(0, 0, 0, 1)
             if (normalizedBone.parent) normalizedBone.parent.quaternion.set(0, 0, 0, 1)
         }
-        setRotation({ x: 0, y: 0, z: 0 })
+        updateEulerDisplay()
     }
 
     if (!selectedBone || !selectedBoneName) return null
@@ -160,36 +163,46 @@ export const RotationPanel = () => {
                 <button onClick={() => setSelectedBone(null, null)} className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded">✕</button>
             </div>
 
+            {/* Euler angle display (read-only) */}
+            <div className="mb-3 text-xs text-gray-500">
+                <span>Euler: </span>
+                <span className="text-red-400">{eulerDisplay.x.toFixed(1)}°</span>
+                <span> / </span>
+                <span className="text-green-400">{eulerDisplay.y.toFixed(1)}°</span>
+                <span> / </span>
+                <span className="text-blue-400">{eulerDisplay.z.toFixed(1)}°</span>
+            </div>
+
             <div className="mb-4">
                 <p className="text-xs text-gray-500 mb-2 font-medium">LOCAL ROTATION</p>
                 <div className="space-y-2">
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
                             <span className="text-red-400 font-medium">X</span>
-                            <span>{rotation.x.toFixed(1)}°</span>
                         </div>
-                        <input type="range" min="-180" max="180" step="1" value={rotation.x}
-                            onChange={(e) => handleRotationChange('x', parseFloat(e.target.value))}
+                        <input type="range" min="-15" max="15" step="1" value={localSlider.x}
+                            onChange={(e) => { const val = parseFloat(e.target.value); setLocalSlider(p => ({ ...p, x: val })); if (val !== 0) handleLocalRotationChange('x', val - localSlider.x) }}
+                            onPointerUp={() => setLocalSlider(p => ({ ...p, x: 0 }))}
                             onMouseEnter={() => setHoveredAxis('localX')} onMouseLeave={() => setHoveredAxis(null)}
                             className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-500" />
                     </div>
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
                             <span className="text-green-400 font-medium">Y</span>
-                            <span>{rotation.y.toFixed(1)}°</span>
                         </div>
-                        <input type="range" min="-180" max="180" step="1" value={rotation.y}
-                            onChange={(e) => handleRotationChange('y', parseFloat(e.target.value))}
+                        <input type="range" min="-15" max="15" step="1" value={localSlider.y}
+                            onChange={(e) => { const val = parseFloat(e.target.value); setLocalSlider(p => ({ ...p, y: val })); if (val !== 0) handleLocalRotationChange('y', val - localSlider.y) }}
+                            onPointerUp={() => setLocalSlider(p => ({ ...p, y: 0 }))}
                             onMouseEnter={() => setHoveredAxis('localY')} onMouseLeave={() => setHoveredAxis(null)}
                             className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500" />
                     </div>
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
                             <span className="text-blue-400 font-medium">Z</span>
-                            <span>{rotation.z.toFixed(1)}°</span>
                         </div>
-                        <input type="range" min="-180" max="180" step="1" value={rotation.z}
-                            onChange={(e) => handleRotationChange('z', parseFloat(e.target.value))}
+                        <input type="range" min="-15" max="15" step="1" value={localSlider.z}
+                            onChange={(e) => { const val = parseFloat(e.target.value); setLocalSlider(p => ({ ...p, z: val })); if (val !== 0) handleLocalRotationChange('z', val - localSlider.z) }}
+                            onPointerUp={() => setLocalSlider(p => ({ ...p, z: 0 }))}
                             onMouseEnter={() => setHoveredAxis('localZ')} onMouseLeave={() => setHoveredAxis(null)}
                             className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500" />
                     </div>
