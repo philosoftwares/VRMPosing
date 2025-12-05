@@ -1,5 +1,5 @@
 import { useStore } from '../../store/useStore'
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useMemo } from 'react'
 import { useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { VRMHumanBoneName } from '@pixiv/three-vrm'
@@ -161,7 +161,7 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
             onPointerOut={() => setIsHovered(false)}
             scale={isHovered || isDragging ? 1.3 : 1}
         >
-            <sphereGeometry args={[size, 16, 16]} />
+            <sphereGeometry args={[size, 12, 12]} />
             <meshBasicMaterial
                 color={(isDragging || isSelected) ? '#00aaff' : isMajor ? '#ff6b6b' : '#ffd93d'}
                 transparent
@@ -216,55 +216,63 @@ export const BoneHelpers = () => {
     const selectedBoneName = useStore((state) => state.selectedBoneName)
     const setSelectedBone = useStore((state) => state.setSelectedBone)
 
-    if (!vrm?.humanoid) return null
+    // Memoize bone collection to avoid recalculating on every render
+    // Must be called before any conditional returns (React hooks rule)
+    const bones = useMemo(() => {
+        if (!vrm?.humanoid) return []
 
-    const bones: { bone: THREE.Object3D; name: string; isMajor: boolean; isFinger: boolean; isHand: boolean }[] = []
+        const result: { bone: THREE.Object3D; name: string; isMajor: boolean; isFinger: boolean; isHand: boolean }[] = []
 
-    // Check if a bone name is a finger bone
-    const isFingerBone = (name: string) => {
-        return name.includes('Thumb') || name.includes('Index') ||
-            name.includes('Middle') || name.includes('Ring') ||
-            name.includes('Little')
-    }
-
-    // Check if a bone is a hand bone
-    const isHandBone = (name: string) => {
-        return name === VRMHumanBoneName.LeftHand || name === VRMHumanBoneName.RightHand
-    }
-
-    // First, add bones from VRMHumanBoneName (using normalized if available, otherwise raw)
-    for (const boneName of Object.values(VRMHumanBoneName)) {
-        const normalizedBone = vrm.humanoid.getNormalizedBoneNode(boneName)
-        const rawBone = vrm.humanoid.getRawBoneNode(boneName)
-        const boneNode = normalizedBone || rawBone
-        if (boneNode) {
-            bones.push({
-                bone: boneNode,
-                name: boneName,
-                isMajor: MAJOR_BONES.has(boneName),
-                isFinger: isFingerBone(boneName),
-                isHand: isHandBone(boneName),
-            })
+        // Check if a bone name is a finger bone
+        const isFingerBone = (name: string) => {
+            return name.includes('Thumb') || name.includes('Index') ||
+                name.includes('Middle') || name.includes('Ring') ||
+                name.includes('Little')
         }
-    }
 
-    // Then, traverse the whole scene to find any additional bones not covered above (e.g., J_Sec_L_Bust1/2)
-    const existingNames = new Set(bones.map((b) => b.name))
-    vrm.scene.traverse((obj) => {
-        if ((obj as any).isBone) {
-            const name = obj.name
-            if (!existingNames.has(name) && name) {
-                bones.push({
-                    bone: obj,
-                    name,
-                    isMajor: false,
-                    isFinger: isFingerBone(name),
-                    isHand: false,
+        // Check if a bone is a hand bone
+        const isHandBone = (name: string) => {
+            return name === VRMHumanBoneName.LeftHand || name === VRMHumanBoneName.RightHand
+        }
+
+        // First, add bones from VRMHumanBoneName
+        for (const boneName of Object.values(VRMHumanBoneName)) {
+            const normalizedBone = vrm.humanoid.getNormalizedBoneNode(boneName)
+            const rawBone = vrm.humanoid.getRawBoneNode(boneName)
+            const boneNode = normalizedBone || rawBone
+            if (boneNode) {
+                result.push({
+                    bone: boneNode,
+                    name: boneName,
+                    isMajor: MAJOR_BONES.has(boneName),
+                    isFinger: isFingerBone(boneName),
+                    isHand: isHandBone(boneName),
                 })
-                existingNames.add(name)
             }
         }
-    })
+
+        // Then, traverse the scene for additional bones
+        const existingNames = new Set(result.map((b) => b.name))
+        vrm.scene.traverse((obj) => {
+            if ((obj as any).isBone) {
+                const name = obj.name
+                if (!existingNames.has(name) && name) {
+                    result.push({
+                        bone: obj,
+                        name,
+                        isMajor: false,
+                        isFinger: isFingerBone(name),
+                        isHand: false,
+                    })
+                    existingNames.add(name)
+                }
+            }
+        })
+
+        return result
+    }, [vrm])
+
+    if (!vrm?.humanoid || bones.length === 0) return null
 
     return (
         <group>
