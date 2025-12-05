@@ -154,7 +154,7 @@ const BoneHelper = ({ bone, isMajor, isSelected, onClick }: BoneHelperProps) => 
 }
 // Bones that should be visible even if they are not major (fingers, eyes, root)
 const VISIBLE_MINOR_BONES: Set<string> = new Set([
-    'root', // VRM model root bone
+    'Root', // VRM model root bone (capital R)
     VRMHumanBoneName.LeftEye,
     VRMHumanBoneName.RightEye,
     // Left Fingers
@@ -219,6 +219,7 @@ export const BoneHelpers = () => {
     vrm.scene.traverse((obj) => {
         if ((obj as any).isBone) {
             const name = obj.name
+            console.log('Found bone:', name) // Debug: show all bone names
             if (!existingNames.has(name) && name) {
                 bones.push({
                     bone: obj,

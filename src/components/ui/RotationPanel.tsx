@@ -58,7 +58,13 @@ export const RotationPanel = () => {
         } else {
             // Fallback for VRM 0.0 or non-humanoid bones
             console.log('Setting raw bone rotation:', selectedBone.name, newRotation)
-            selectedBone.quaternion.setFromEuler(euler)
+
+            // Special case: if rotating 'Root' bone, ONLY rotate the whole model scene (not the bone itself)
+            if (selectedBoneName === 'Root' && vrm?.scene) {
+                vrm.scene.quaternion.setFromEuler(euler)
+            } else {
+                selectedBone.quaternion.setFromEuler(euler)
+            }
         }
     }
 
