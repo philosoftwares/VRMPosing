@@ -1,5 +1,32 @@
 # Changelog
 
+## 2025-12-05 - Session 4
+
+### VRM 0.0 Root Bone Fixes
+- **Relative Rotation System**: Root bone now uses relative rotation from initial position
+  - Stores initial quaternion when Root bone is selected
+  - Slider values represent delta from initial position (no jumping)
+  - Fixes the "model snaps backward" issue when starting to rotate
+
+- **Reset Rotation Fix**: Now restores to original VRM rotation
+  - Added `initialSceneQuat` to global store
+  - Saves VRM scene quaternion when model loads
+  - Reset button restores to this original state
+
+- **Rotation Gizmo for Root**: 
+  - Gizmo now correctly positions at model origin for Root bone
+  - Proper orientation for both local and global rotation modes
+
+### Technical Changes
+- `useStore.ts`: Added `initialSceneQuat` and `setInitialSceneQuat`
+- `VRMModel.tsx`: Saves initial scene quaternion on VRM load
+- `RotationPanel.tsx`: 
+  - Refactored Root bone rotation to use relative quaternion math
+  - `handleRotationChange`: Uses `initialQuat * deltaQuat` for Root
+  - `handleGlobalRotationChange`: Updates `initialQuat` after world rotation
+  - `resetRotation`: Restores to `initialSceneQuat` for Root/Hips
+
+
 ## 2025-12-05 - Session 3
 
 ### Features
@@ -7,7 +34,6 @@
   - Sliders follow mouse during drag
   - Spring-back to center (0) on release
   - 3x sensitivity multiplier for responsive control
-
 
 ## 2025-12-05 - Session 2
 

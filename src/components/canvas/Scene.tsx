@@ -3,6 +3,7 @@ import { OrbitControls, Grid } from '@react-three/drei'
 import { VRMModel } from './VRMModel'
 import { BoneGizmo } from './BoneGizmo'
 import { BoneHelpers } from './BoneHelpers'
+import { RotationGizmo } from './RotationGizmo'
 import { useStore } from '../../store/useStore'
 
 export const Scene = () => {
@@ -28,6 +29,7 @@ export const Scene = () => {
             <VRMModel />
             <BoneHelpers />
             <BoneGizmo />
+            <RotationGizmo />
         </Canvas>
     )
 }

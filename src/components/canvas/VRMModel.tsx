@@ -4,19 +4,16 @@ import { useThree, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { VRMHumanBoneName } from '@pixiv/three-vrm'
 
-// Helper to find bone from clicked mesh
 const findParentBone = (object: THREE.Object3D | null): THREE.Object3D | null => {
     if (!object) return null
     if (object.userData?.isBone || object.type === 'Bone') return object
     return findParentBone(object.parent)
 }
 
-// Get bone name from VRM humanoid
 const getBoneName = (vrm: ReturnType<typeof useStore.getState>['vrm'], bone: THREE.Object3D): string | null => {
     if (!vrm) return null
 
     for (const boneName of Object.values(VRMHumanBoneName)) {
-        // Check both normalized and raw bones
         const normalizedBone = vrm.humanoid?.getNormalizedBoneNode(boneName)
         const rawBone = vrm.humanoid?.getRawBoneNode(boneName)
         if (normalizedBone === bone || rawBone === bone) {
@@ -29,20 +26,22 @@ const getBoneName = (vrm: ReturnType<typeof useStore.getState>['vrm'], bone: THR
 export const VRMModel = () => {
     const vrm = useStore((state) => state.vrm)
     const setSelectedBone = useStore((state) => state.setSelectedBone)
+    const setInitialSceneQuat = useStore((state) => state.setInitialSceneQuat)
     const groupRef = useRef<THREE.Group>(null)
     const { raycaster, camera, pointer } = useThree()
 
     useEffect(() => {
-        // VRM model mounted
+        if (vrm) {
+            // Save initial rotation so reset can restore it
+            setInitialSceneQuat(vrm.scene.quaternion)
+        }
     }, [vrm])
 
-    // Update VRM every frame to apply bone rotations to the mesh
     useFrame((_, delta) => {
         if (vrm) {
             vrm.humanoid?.update()
             vrm.lookAt?.update(delta)
             vrm.expressionManager?.update()
-            // vrm.springBoneManager?.update(delta) // Disabled for manual posing
         }
     })
 
@@ -51,7 +50,6 @@ export const VRMModel = () => {
 
         if (!vrm) return
 
-        // Don't process clicks if we just finished dragging a bone sphere
         const isDragging = useStore.getState().isDragging
         if (isDragging) return
 
