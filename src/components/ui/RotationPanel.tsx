@@ -91,6 +91,12 @@ export const RotationPanel = () => {
 
         console.log('Reset Drag for:', selectedBoneName, selectedBone.name)
 
+        // Special case for Root bone: only reset position, not rotation
+        if (selectedBoneName === 'Root' && vrm?.scene) {
+            vrm.scene.position.set(0, 0, 0)
+            return
+        }
+
         // Reset the selected bone's quaternion
         selectedBone.quaternion.set(0, 0, 0, 1)
 
@@ -107,12 +113,6 @@ export const RotationPanel = () => {
             if (normalizedBone.parent) {
                 normalizedBone.parent.quaternion.set(0, 0, 0, 1)
             }
-        }
-
-        // Also reset vrm.scene for Root bone (both position and rotation)
-        if (selectedBoneName === 'Root' && vrm?.scene) {
-            vrm.scene.position.set(0, 0, 0)
-            vrm.scene.quaternion.set(0, 0, 0, 1)
         }
 
         // Sync rotation state
