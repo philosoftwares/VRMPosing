@@ -43,13 +43,20 @@
 - [x] **Reset Rotation**: Orbit to front view (+Z), keep distance
 - [x] **Reset All**: Reset both to defaults
 
+### Eye Direction Panel (bottom-left, next to Drag Panel)
+- [x] **Horizontal Slider**: Control eye yaw (±90°)
+- [x] **Vertical Slider**: Control eye pitch (±90°)
+- [x] **Undo/Redo Support**: Eye direction syncs with history
+- [x] **Reset Button**: Reset eyes to 0°, 0°
+
 ### UI Layout
 - [x] **Upload Panel**: Top-left with model info beside it
 - [x] **Undo/Redo**: Below Upload panel
 - [x] **Rotation Panel**: Top-right (scrollable)
 - [x] **Drag Panel**: Bottom-left
+- [x] **Eye Panel**: Next to Drag Panel
 - [x] **Reset All**: Bottom-right
 - [x] **Camera Panel**: Next to Reset All
 
 ---
-*Last Updated: 2025-12-06 06:00*
+*Last Updated: 2025-12-06 07:18*

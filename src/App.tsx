@@ -5,12 +5,14 @@ import { ResetAllPanel } from './components/ui/ResetAllPanel'
 import { HistoryPanel } from './components/ui/HistoryPanel'
 import { DragPanel } from './components/ui/DragPanel'
 import { CameraResetPanel } from './components/ui/CameraResetPanel'
+import { EyePanel } from './components/ui/EyePanel'
 
 function App() {
     return (
         <div className="w-full h-screen bg-gray-900 overflow-hidden relative">
             <Upload />
             <HistoryPanel />
+            <EyePanel />
             <CameraResetPanel />
             <ResetAllPanel />
             <DragPanel />

@@ -28,9 +28,18 @@
 - **Reset Rotation**: Orbit to front view (+Z), keep distance
 - **Reset All**: Reset position and rotation to defaults
 
+### Eye Direction Panel
+- **EyePanel.tsx**: New panel at bottom-left (next to DragPanel)
+- **Horizontal Slider**: Control eye yaw (±90°)
+- **Vertical Slider**: Control eye pitch (±90°)
+- **Undo/Redo Support**: Eye direction saved in snapshot, syncs with history
+- **Purple Theme**: Consistent with other UI panels
+- **Reset Button**: Reset eyes to center (0°, 0°)
+
 ### Bug Fixes
 - **VRM Version Detection**: Fixed to check `metaVersion === '1'` specifically
 - **DragPanel Close Button**: Added close button like RotationPanel
+- **Eye Reset on Load**: Eye direction resets when loading new model
 
 ---
 

@@ -10,6 +10,8 @@ interface PoseSnapshot {
     bones: Map<string, THREE.Quaternion>
     sceneQuat: THREE.Quaternion
     scenePos: THREE.Vector3
+    eyeYaw: number
+    eyePitch: number
 }
 
 interface AppState {
@@ -27,6 +29,10 @@ interface AppState {
     setIsDragging: (isDragging: boolean) => void
     hoveredAxis: AxisType
     setHoveredAxis: (axis: AxisType) => void
+    // Eye direction
+    eyeYaw: number
+    eyePitch: number
+    setEyeDirection: (yaw: number, pitch: number) => void
     // Camera controls
     cameraResetCallbacks: {
         focusToModel?: () => void
@@ -54,10 +60,16 @@ const createSnapshot = (vrm: VRM): PoseSnapshot => {
             bones.set(boneName, bone.quaternion.clone())
         }
     }
+
+    // Get current eye direction from store
+    const state = useStore.getState()
+
     return {
         bones,
         sceneQuat: vrm.scene.quaternion.clone(),
-        scenePos: vrm.scene.position.clone()
+        scenePos: vrm.scene.position.clone(),
+        eyeYaw: state.eyeYaw,
+        eyePitch: state.eyePitch
     }
 }
 
@@ -70,6 +82,14 @@ const applySnapshot = (vrm: VRM, snapshot: PoseSnapshot) => {
     }
     vrm.scene.quaternion.copy(snapshot.sceneQuat)
     vrm.scene.position.copy(snapshot.scenePos)
+
+    // Restore eye direction
+    useStore.setState({ eyeYaw: snapshot.eyeYaw, eyePitch: snapshot.eyePitch })
+
+    // Apply to VRM lookAt
+    if (vrm.lookAt?.applier && 'applyYawPitch' in vrm.lookAt.applier) {
+        (vrm.lookAt.applier as any).applyYawPitch(snapshot.eyeYaw, snapshot.eyePitch)
+    }
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -79,6 +99,9 @@ export const useStore = create<AppState>((set, get) => ({
         const isVRM1 = vrm?.meta ? (
             'metaVersion' in vrm.meta && vrm.meta.metaVersion === '1'
         ) : false
+
+        // Reset eye direction first so snapshot captures correct values
+        set({ eyeYaw: 0, eyePitch: 0 })
 
         set({
             vrm,
@@ -101,6 +124,10 @@ export const useStore = create<AppState>((set, get) => ({
     setIsDragging: (isDragging) => set({ isDragging }),
     hoveredAxis: null,
     setHoveredAxis: (hoveredAxis) => set({ hoveredAxis }),
+    // Eye direction
+    eyeYaw: 0,
+    eyePitch: 0,
+    setEyeDirection: (yaw, pitch) => set({ eyeYaw: yaw, eyePitch: pitch }),
     // Camera reset
     cameraResetCallbacks: {},
     setCameraResetCallbacks: (callbacks) => set({ cameraResetCallbacks: callbacks }),
