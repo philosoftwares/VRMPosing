@@ -274,10 +274,7 @@ export const RotationPanel = () => {
     return (
         <div className="absolute top-4 right-4 p-4 bg-black/90 backdrop-blur-sm rounded-lg shadow-lg z-10 w-80 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-3">
-                <div>
-                    <p className="text-xs text-gray-400">Selected Bone</p>
-                    <p className="text-sm font-bold text-white">{selectedBoneName}</p>
-                </div>
+                <p className="text-xs text-gray-500 font-medium">ROTATION</p>
                 <button onClick={() => setSelectedBone(null, null)} className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded">✕</button>
             </div>
 
@@ -292,11 +289,10 @@ export const RotationPanel = () => {
             </div>
 
             <div className="mb-4">
-                <p className="text-xs text-gray-500 mb-2 font-medium">LOCAL ROTATION</p>
                 <div className="space-y-2">
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
-                            <span className="text-red-400 font-medium">X</span>
+                            <span className="text-red-400 font-medium">Local X</span>
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={localSlider.x}
                             onChange={(e) => { const val = parseFloat(e.target.value); setLocalSlider(p => ({ ...p, x: val })); if (val !== 0) handleLocalRotationChange('x', val - localSlider.x) }}
@@ -306,7 +302,7 @@ export const RotationPanel = () => {
                     </div>
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
-                            <span className="text-green-400 font-medium">Y</span>
+                            <span className="text-green-400 font-medium">Local Y</span>
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={localSlider.y}
                             onChange={(e) => { const val = parseFloat(e.target.value); setLocalSlider(p => ({ ...p, y: val })); if (val !== 0) handleLocalRotationChange('y', val - localSlider.y) }}
@@ -316,7 +312,7 @@ export const RotationPanel = () => {
                     </div>
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
-                            <span className="text-blue-400 font-medium">Z</span>
+                            <span className="text-blue-400 font-medium">Local Z</span>
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={localSlider.z}
                             onChange={(e) => { const val = parseFloat(e.target.value); setLocalSlider(p => ({ ...p, z: val })); if (val !== 0) handleLocalRotationChange('z', val - localSlider.z) }}
@@ -328,7 +324,6 @@ export const RotationPanel = () => {
             </div>
 
             <div className="mb-4 pt-3 border-t border-gray-700">
-                <p className="text-xs text-gray-500 mb-2 font-medium">GLOBAL ROTATION</p>
                 <div className="space-y-2">
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">

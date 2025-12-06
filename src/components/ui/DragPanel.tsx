@@ -181,20 +181,16 @@ export const DragPanel = () => {
     return (
         <div className="absolute bottom-4 left-4 p-3 bg-black/90 backdrop-blur-sm rounded-lg shadow-lg z-10 w-56">
             <div className="flex items-center justify-between mb-2">
-                <div>
-                    <p className="text-xs text-gray-400 font-medium">DRAG POSITION</p>
-                    <p className="text-xs text-gray-600">{selectedBoneName}</p>
-                </div>
+                <p className="text-xs text-gray-500 font-medium">DRAG</p>
                 <button onClick={() => setSelectedBone(null, null)} className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded">✕</button>
             </div>
 
             {/* LOCAL DRAG */}
             <div className="mb-3">
-                <p className="text-xs text-gray-500 mb-2 font-medium">LOCAL</p>
                 <div className="space-y-2">
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
-                            <span className="text-orange-400 font-medium">X</span>
+                            <span className="text-orange-400 font-medium">Local X</span>
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={localDragSlider.x}
                             onPointerDown={captureInitialState}
@@ -205,7 +201,7 @@ export const DragPanel = () => {
                     </div>
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
-                            <span className="text-orange-300 font-medium">Y</span>
+                            <span className="text-orange-300 font-medium">Local Y</span>
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={localDragSlider.y}
                             onPointerDown={captureInitialState}
@@ -216,7 +212,7 @@ export const DragPanel = () => {
                     </div>
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
-                            <span className="text-orange-200 font-medium">Z</span>
+                            <span className="text-orange-200 font-medium">Local Z</span>
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={localDragSlider.z}
                             onPointerDown={captureInitialState}
@@ -230,12 +226,10 @@ export const DragPanel = () => {
 
             {/* WORLD DRAG */}
             <div className="pt-3 border-t border-gray-700">
-                <p className="text-xs text-gray-500 mb-2 font-medium">WORLD</p>
                 <div className="space-y-2">
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
-                            <span className="text-yellow-400 font-medium">X</span>
-                            <span className="text-gray-600 text-[10px]">Left/Right</span>
+                            <span className="text-yellow-400 font-medium">World X</span>
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={worldDragSlider.x}
                             onPointerDown={captureInitialState}
@@ -246,8 +240,7 @@ export const DragPanel = () => {
                     </div>
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
-                            <span className="text-yellow-300 font-medium">Y</span>
-                            <span className="text-gray-600 text-[10px]">Up/Down</span>
+                            <span className="text-yellow-300 font-medium">World Y</span>
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={worldDragSlider.y}
                             onPointerDown={captureInitialState}
@@ -258,8 +251,7 @@ export const DragPanel = () => {
                     </div>
                     <div>
                         <div className="flex justify-between text-xs text-gray-400 mb-1">
-                            <span className="text-yellow-200 font-medium">Z</span>
-                            <span className="text-gray-600 text-[10px]">Front/Back</span>
+                            <span className="text-yellow-200 font-medium">World Z</span>
                         </div>
                         <input type="range" min="-15" max="15" step="1" value={worldDragSlider.z}
                             onPointerDown={captureInitialState}

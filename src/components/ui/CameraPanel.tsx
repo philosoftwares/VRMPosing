@@ -75,17 +75,16 @@ export const CameraPanel = () => {
     if (!vrm) return null
 
     const inputClass = "w-14 px-1 py-0.5 text-xs bg-gray-800 text-white rounded border border-gray-600 focus:border-cyan-500 focus:outline-none text-center"
-    const labelClass = "text-xs text-gray-500 w-3"
 
     return (
         <div className="absolute bottom-4 left-64 p-3 bg-black/90 backdrop-blur-sm rounded-lg shadow-lg z-10">
             <p className="text-xs text-gray-500 mb-2 font-medium">CAMERA</p>
 
-            {/* Position */}
-            <div className="mb-2">
-                <p className="text-xs text-gray-400 mb-1">Position</p>
-                <div className="flex gap-1 items-center">
-                    <span className={labelClass}>X</span>
+            {/* Position & Orbit - aligned columns */}
+            <div className="mb-3 space-y-1">
+                {/* Position Row */}
+                <div className="flex gap-1 items-center text-xs">
+                    <span className="text-gray-400 w-6">X</span>
                     <input
                         type="text"
                         value={posX}
@@ -95,7 +94,7 @@ export const CameraPanel = () => {
                         onKeyDown={(e) => handleKeyDown(e, applyPosition)}
                         className={inputClass}
                     />
-                    <span className={labelClass}>Y</span>
+                    <span className="text-gray-400 w-6 ml-2">Y</span>
                     <input
                         type="text"
                         value={posY}
@@ -105,7 +104,7 @@ export const CameraPanel = () => {
                         onKeyDown={(e) => handleKeyDown(e, applyPosition)}
                         className={inputClass}
                     />
-                    <span className={labelClass}>Z</span>
+                    <span className="text-gray-400 w-6 ml-2">Z</span>
                     <input
                         type="text"
                         value={posZ}
@@ -116,13 +115,9 @@ export const CameraPanel = () => {
                         className={inputClass}
                     />
                 </div>
-            </div>
-
-            {/* Orbit Angle */}
-            <div className="mb-3">
-                <p className="text-xs text-gray-400 mb-1">Orbit (°)</p>
+                {/* Orbit Row */}
                 <div className="flex gap-1 items-center text-xs">
-                    <span className="text-gray-500 w-8">Az</span>
+                    <span className="text-gray-500 w-6">Az</span>
                     <input
                         type="text"
                         value={azimuth}
@@ -133,7 +128,7 @@ export const CameraPanel = () => {
                         className={inputClass}
                         title="Azimuth: horizontal angle (0° = front)"
                     />
-                    <span className="text-gray-500 w-8">El</span>
+                    <span className="text-gray-500 w-6 ml-2">El</span>
                     <input
                         type="text"
                         value={elevation}
@@ -144,7 +139,7 @@ export const CameraPanel = () => {
                         className={inputClass}
                         title="Elevation: vertical angle (0° = eye level)"
                     />
-                    <span className="text-gray-500 w-8">Dist</span>
+                    <span className="text-gray-500 w-6 ml-2">Dist</span>
                     <input
                         type="text"
                         value={distance}
@@ -159,7 +154,7 @@ export const CameraPanel = () => {
             </div>
 
             {/* Reset Buttons */}
-            <div className="flex gap-1">
+            <div className="flex justify-between">
                 <button
                     onClick={() => cameraResetCallbacks.focusToModel?.()}
                     className="px-2 py-1.5 text-xs bg-green-700 hover:bg-green-600 text-white rounded"

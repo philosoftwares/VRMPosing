@@ -9,6 +9,8 @@ export const Upload = () => {
     const isVRM1 = useStore((state) => state.isVRM1)
     const setVrm = useStore((state) => state.setVrm)
     const setVrmFileName = useStore((state) => state.setVrmFileName)
+    const selectedBoneName = useStore((state) => state.selectedBoneName)
+    const setSelectedBone = useStore((state) => state.setSelectedBone)
     const [loading, setLoading] = useState(false)
     const [progress, setProgress] = useState(0)
 
@@ -76,7 +78,7 @@ export const Upload = () => {
                 </div>
             </div>
 
-            {/* Model Info (text only, no panel) */}
+            {/* Model Info + Selected Bone */}
             {vrm && (
                 <div className="pt-2 text-xs">
                     <p className="text-gray-300 truncate max-w-40" title={vrmFileName || ''}>
@@ -85,6 +87,19 @@ export const Upload = () => {
                     <p className="text-gray-500">
                         VRM {isVRM1 ? '1.0' : '0.x'}
                     </p>
+                    {selectedBoneName && (
+                        <div className="mt-2 flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
+                            <span className="text-blue-300 font-medium">{selectedBoneName}</span>
+                            <button
+                                onClick={() => setSelectedBone(null, null)}
+                                className="text-gray-500 hover:text-white text-xs"
+                                title="Clear selection"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

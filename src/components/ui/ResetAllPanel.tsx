@@ -172,25 +172,27 @@ export const ResetAllPanel = () => {
     return (
         <div className="absolute bottom-4 right-4 p-3 bg-black/90 backdrop-blur-sm rounded-lg shadow-lg z-10">
             <p className="text-xs text-gray-500 mb-2 font-medium">RESET ALL BONES</p>
-            <div className="grid grid-cols-2 gap-2 w-56">
-                <button onClick={resetAllExceptRootDrag} className="px-2 py-2 text-xs bg-purple-700 hover:bg-purple-600 text-white rounded" title="Reset semua + rotasi Root, tapi bukan posisi">
-                    All (Keep Pos)
+            <div className="flex gap-2 mb-2">
+                <button onClick={resetAllExceptRootDrag} className="flex-1 px-2 py-2 text-xs bg-purple-700 hover:bg-purple-600 text-white rounded" title="Reset semua + rotasi Root, tapi bukan posisi">
+                    Keep Pos
                 </button>
-                <button onClick={resetAllExceptRootRotation} className="px-2 py-2 text-xs bg-purple-700 hover:bg-purple-600 text-white rounded" title="Reset semua + posisi Root, tapi bukan rotasi">
-                    All (Keep Rot)
+                <button onClick={resetAllExceptRootRotation} className="flex-1 px-2 py-2 text-xs bg-purple-700 hover:bg-purple-600 text-white rounded" title="Reset semua + posisi Root, tapi bukan rotasi">
+                    Keep Rot
                 </button>
-                <button onClick={resetAllExceptRoot} className="px-2 py-2 text-xs bg-purple-800 hover:bg-purple-700 text-white rounded" title="Reset semua bone kecuali Root">
-                    All (Keep Root)
+            </div>
+            <div className="flex gap-2 mb-2">
+                <button onClick={resetAllExceptRoot} className="flex-1 px-2 py-2 text-xs bg-purple-800 hover:bg-purple-700 text-white rounded" title="Reset semua bone kecuali Root">
+                    Keep Root
                 </button>
-                <button onClick={resetAllIncludingRoot} className="px-2 py-2 text-xs bg-red-800 hover:bg-red-700 text-white rounded" title="Reset SEMUA termasuk Root">
+                <button onClick={resetAllIncludingRoot} className="flex-1 px-2 py-2 text-xs bg-red-800 hover:bg-red-700 text-white rounded" title="Reset SEMUA termasuk Root">
                     All + Root
                 </button>
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="flex gap-2">
                 {hasLRBoneSelected && (
                     <button
                         onClick={handleMirrorAll}
-                        className="px-2 py-2 text-xs bg-cyan-700 hover:bg-cyan-600 text-white rounded"
+                        className="flex-1 px-2 py-2 text-xs bg-cyan-700 hover:bg-cyan-600 text-white rounded"
                         title="Copy pose dari sisi yang dipilih ke sisi berlawanan"
                     >
                         {getMirrorLabel()}
@@ -198,7 +200,7 @@ export const ResetAllPanel = () => {
                 )}
                 <button
                     onClick={swapAllBones}
-                    className={`px-2 py-2 text-xs bg-teal-700 hover:bg-teal-600 text-white rounded ${!hasLRBoneSelected ? 'col-span-2' : ''}`}
+                    className={`flex-1 px-2 py-2 text-xs bg-teal-700 hover:bg-teal-600 text-white rounded`}
                     title="Tukar pose kiri dan kanan"
                 >
                     ↔ Swap L↔R

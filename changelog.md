@@ -56,6 +56,13 @@
 - **Bone Sphere Sync**: Added `updateMatrixWorld(true)` to keep spheres synced during drag
 - **Hips LOCAL Drag**: Uses Hips bone world quaternion for proper local orientation
 
+### UI Layout Improvements
+- **Selected Bone Label**: Moved to Upload panel below model info
+- **Rotation Panel**: Removed section headers, slider labels now "Local X/Y/Z" and "World X/Y/Z"
+- **Drag Panel**: Same slider label format, simplified header to "DRAG"
+- **Camera Panel**: Two-row layout with X/Y/Z and Az/El/Dist aligned vertically
+- **Reset All Panel**: Flex layout with equal-width buttons, simplified labels
+
 ---
 
 ## 2025-12-05 - Session 7
