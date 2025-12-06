@@ -44,10 +44,12 @@
 - Edit values by clicking, typing, and pressing Enter
 
 ### Bone Mirroring
-- **Mirror Button**: Appears in RotationPanel when Left/Right bone selected
+- **Mirror Button**: In RotationPanel, copies single bone to opposite side
+- **Mirror All Button**: In ResetAllPanel, copies ALL bones from selected side (L→R or R→L)
+  - Only visible when Left/Right bone is selected
+- **Swap L↔R Button**: In ResetAllPanel, exchanges all Left↔Right bones bidirectionally
 - **60+ Bone Pairs**: Arms, legs, fingers, eyes fully mapped
-- **Mirrors Both**: Bone rotation AND drag (parent quaternion)
-- **One-way Copy**: Source bone → opposite side with X-axis flip
+- **Quaternion X-flip**: Proper mirroring with Y/Z negation
 
 ### Bug Fixes
 - **VRM Version Detection**: Fixed to check `metaVersion === '1'` specifically

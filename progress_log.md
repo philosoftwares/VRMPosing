@@ -26,6 +26,8 @@
 - [x] **All (Keep Rot)**: Reset all + posisi Root, tapi bukan rotasi
 - [x] **All (Keep Root)**: Reset semua bone kecuali Root
 - [x] **All + Root**: Reset SEMUA termasuk Root
+- [x] **Mirror All (L→R / R→L)**: Copy semua bone dari sisi yang dipilih
+- [x] **Swap L↔R**: Tukar semua bone kiri dan kanan
 
 ### Undo/Redo System
 - [x] **Unlimited History**: All actions saved as snapshots
@@ -57,9 +59,10 @@
 - [x] **Spherical Coordinates**: Works correctly with OrbitControls
 
 ### Bone Mirroring
-- [x] **Mirror Button**: In RotationPanel for Left/Right bones
+- [x] **Mirror Button**: In RotationPanel, copies single bone to opposite side
+- [x] **Mirror All**: Copies ALL bones from selected side (only when L/R bone selected)
+- [x] **Swap L↔R**: Exchanges all Left↔Right bones bidirectionally
 - [x] **60+ Bone Pairs**: Arms, legs, fingers, eyes mapped
-- [x] **Mirrors Rotation + Drag**: Both bone and parent quaternion
 
 ### UI Layout
 - [x] **Upload Panel**: Top-left with model info beside it
@@ -71,4 +74,4 @@
 - [x] **Camera Reset Panel**: Next to Reset All
 
 ---
-*Last Updated: 2025-12-06 08:20*
+*Last Updated: 2025-12-06 08:42*
