@@ -3,6 +3,65 @@ import { useState, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { VRMHumanBoneName } from '@pixiv/three-vrm'
 
+// Bone mirror mapping (Left <-> Right)
+const BONE_MIRROR_MAP: Record<string, string> = {
+    // Arms
+    [VRMHumanBoneName.LeftShoulder]: VRMHumanBoneName.RightShoulder,
+    [VRMHumanBoneName.RightShoulder]: VRMHumanBoneName.LeftShoulder,
+    [VRMHumanBoneName.LeftUpperArm]: VRMHumanBoneName.RightUpperArm,
+    [VRMHumanBoneName.RightUpperArm]: VRMHumanBoneName.LeftUpperArm,
+    [VRMHumanBoneName.LeftLowerArm]: VRMHumanBoneName.RightLowerArm,
+    [VRMHumanBoneName.RightLowerArm]: VRMHumanBoneName.LeftLowerArm,
+    [VRMHumanBoneName.LeftHand]: VRMHumanBoneName.RightHand,
+    [VRMHumanBoneName.RightHand]: VRMHumanBoneName.LeftHand,
+    // Legs
+    [VRMHumanBoneName.LeftUpperLeg]: VRMHumanBoneName.RightUpperLeg,
+    [VRMHumanBoneName.RightUpperLeg]: VRMHumanBoneName.LeftUpperLeg,
+    [VRMHumanBoneName.LeftLowerLeg]: VRMHumanBoneName.RightLowerLeg,
+    [VRMHumanBoneName.RightLowerLeg]: VRMHumanBoneName.LeftLowerLeg,
+    [VRMHumanBoneName.LeftFoot]: VRMHumanBoneName.RightFoot,
+    [VRMHumanBoneName.RightFoot]: VRMHumanBoneName.LeftFoot,
+    [VRMHumanBoneName.LeftToes]: VRMHumanBoneName.RightToes,
+    [VRMHumanBoneName.RightToes]: VRMHumanBoneName.LeftToes,
+    // Eyes
+    [VRMHumanBoneName.LeftEye]: VRMHumanBoneName.RightEye,
+    [VRMHumanBoneName.RightEye]: VRMHumanBoneName.LeftEye,
+    // Fingers - Thumb
+    [VRMHumanBoneName.LeftThumbMetacarpal]: VRMHumanBoneName.RightThumbMetacarpal,
+    [VRMHumanBoneName.RightThumbMetacarpal]: VRMHumanBoneName.LeftThumbMetacarpal,
+    [VRMHumanBoneName.LeftThumbProximal]: VRMHumanBoneName.RightThumbProximal,
+    [VRMHumanBoneName.RightThumbProximal]: VRMHumanBoneName.LeftThumbProximal,
+    [VRMHumanBoneName.LeftThumbDistal]: VRMHumanBoneName.RightThumbDistal,
+    [VRMHumanBoneName.RightThumbDistal]: VRMHumanBoneName.LeftThumbDistal,
+    // Fingers - Index
+    [VRMHumanBoneName.LeftIndexProximal]: VRMHumanBoneName.RightIndexProximal,
+    [VRMHumanBoneName.RightIndexProximal]: VRMHumanBoneName.LeftIndexProximal,
+    [VRMHumanBoneName.LeftIndexIntermediate]: VRMHumanBoneName.RightIndexIntermediate,
+    [VRMHumanBoneName.RightIndexIntermediate]: VRMHumanBoneName.LeftIndexIntermediate,
+    [VRMHumanBoneName.LeftIndexDistal]: VRMHumanBoneName.RightIndexDistal,
+    [VRMHumanBoneName.RightIndexDistal]: VRMHumanBoneName.LeftIndexDistal,
+    // Fingers - Middle
+    [VRMHumanBoneName.LeftMiddleProximal]: VRMHumanBoneName.RightMiddleProximal,
+    [VRMHumanBoneName.RightMiddleProximal]: VRMHumanBoneName.LeftMiddleProximal,
+    [VRMHumanBoneName.LeftMiddleIntermediate]: VRMHumanBoneName.RightMiddleIntermediate,
+    [VRMHumanBoneName.RightMiddleIntermediate]: VRMHumanBoneName.LeftMiddleIntermediate,
+    [VRMHumanBoneName.LeftMiddleDistal]: VRMHumanBoneName.RightMiddleDistal,
+    [VRMHumanBoneName.RightMiddleDistal]: VRMHumanBoneName.LeftMiddleDistal,
+    // Fingers - Ring
+    [VRMHumanBoneName.LeftRingProximal]: VRMHumanBoneName.RightRingProximal,
+    [VRMHumanBoneName.RightRingProximal]: VRMHumanBoneName.LeftRingProximal,
+    [VRMHumanBoneName.LeftRingIntermediate]: VRMHumanBoneName.RightRingIntermediate,
+    [VRMHumanBoneName.RightRingIntermediate]: VRMHumanBoneName.LeftRingIntermediate,
+    [VRMHumanBoneName.LeftRingDistal]: VRMHumanBoneName.RightRingDistal,
+    [VRMHumanBoneName.RightRingDistal]: VRMHumanBoneName.LeftRingDistal,
+    // Fingers - Little
+    [VRMHumanBoneName.LeftLittleProximal]: VRMHumanBoneName.RightLittleProximal,
+    [VRMHumanBoneName.RightLittleProximal]: VRMHumanBoneName.LeftLittleProximal,
+    [VRMHumanBoneName.LeftLittleIntermediate]: VRMHumanBoneName.RightLittleIntermediate,
+    [VRMHumanBoneName.RightLittleIntermediate]: VRMHumanBoneName.LeftLittleIntermediate,
+    [VRMHumanBoneName.LeftLittleDistal]: VRMHumanBoneName.RightLittleDistal,
+    [VRMHumanBoneName.RightLittleDistal]: VRMHumanBoneName.LeftLittleDistal,
+}
 export const RotationPanel = () => {
     const vrm = useStore((state) => state.vrm)
     const selectedBone = useStore((state) => state.selectedBone)
@@ -168,6 +227,48 @@ export const RotationPanel = () => {
         updateEulerDisplay()
     }
 
+    // Get mirror bone name
+    const getMirrorBoneName = (): string | null => {
+        if (!selectedBoneName) return null
+        return BONE_MIRROR_MAP[selectedBoneName] || null
+    }
+
+    // Mirror rotation to opposite bone
+    const mirrorToOpposite = () => {
+        if (!vrm || !selectedBoneName) return
+
+        const mirrorBoneName = getMirrorBoneName()
+        if (!mirrorBoneName) return
+
+        const sourceBone = vrm.humanoid?.getNormalizedBoneNode(selectedBoneName as VRMHumanBoneName)
+        const targetBone = vrm.humanoid?.getNormalizedBoneNode(mirrorBoneName as VRMHumanBoneName)
+
+        if (!sourceBone || !targetBone) return
+
+        // Mirror quaternion: negate Y and Z components to flip across X axis (YZ plane mirror)
+        const sourceQuat = sourceBone.quaternion
+        targetBone.quaternion.set(
+            sourceQuat.x,
+            -sourceQuat.y,
+            -sourceQuat.z,
+            sourceQuat.w
+        )
+
+        // Also mirror parent quaternion (drag rotation)
+        if (sourceBone.parent && targetBone.parent) {
+            const sourceParentQuat = sourceBone.parent.quaternion
+            targetBone.parent.quaternion.set(
+                sourceParentQuat.x,
+                -sourceParentQuat.y,
+                -sourceParentQuat.z,
+                sourceParentQuat.w
+            )
+        }
+
+        saveSnapshot()
+    }
+
+    const mirrorBoneName = getMirrorBoneName()
     if (!selectedBone || !selectedBoneName) return null
 
     return (
@@ -266,6 +367,19 @@ export const RotationPanel = () => {
                 <button onClick={() => { resetRotation(); saveSnapshot() }} className="flex-1 px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded">Reset Rotation</button>
                 <button onClick={() => { resetDrag(); saveSnapshot() }} className="flex-1 px-3 py-2 text-xs bg-orange-700 hover:bg-orange-600 text-white rounded">Reset Drag</button>
             </div>
+
+            {/* Mirror Button - only show for Left/Right bones */}
+            {mirrorBoneName && (
+                <div className="mt-3">
+                    <button
+                        onClick={mirrorToOpposite}
+                        className="w-full px-3 py-2 text-xs bg-purple-700 hover:bg-purple-600 text-white rounded"
+                        title={`Copy rotation to ${mirrorBoneName}`}
+                    >
+                        Mirror → {mirrorBoneName}
+                    </button>
+                </div>
+            )}
         </div>
     )
 }

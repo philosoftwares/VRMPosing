@@ -12,3 +12,5 @@ request:
 
 
     tampilkan panel eye direction yang dihide/dikomentari
+
+    tambahkan tombol untuk mirroring bone

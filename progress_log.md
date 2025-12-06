@@ -56,14 +56,19 @@
 - [x] **Distance**: Distance from target
 - [x] **Spherical Coordinates**: Works correctly with OrbitControls
 
+### Bone Mirroring
+- [x] **Mirror Button**: In RotationPanel for Left/Right bones
+- [x] **60+ Bone Pairs**: Arms, legs, fingers, eyes mapped
+- [x] **Mirrors Rotation + Drag**: Both bone and parent quaternion
+
 ### UI Layout
 - [x] **Upload Panel**: Top-left with model info beside it
 - [x] **Undo/Redo**: Below Upload panel
-- [x] **Rotation Panel**: Top-right (scrollable)
+- [x] **Rotation Panel**: Top-right (scrollable, with Mirror button)
 - [x] **Drag Panel**: Bottom-left
 - [x] **Camera Info Panel**: Next to Drag Panel
 - [x] **Reset All**: Bottom-right
 - [x] **Camera Reset Panel**: Next to Reset All
 
 ---
-*Last Updated: 2025-12-06 07:59*
+*Last Updated: 2025-12-06 08:20*

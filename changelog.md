@@ -43,6 +43,12 @@
   - **Distance**: Distance from target
 - Edit values by clicking, typing, and pressing Enter
 
+### Bone Mirroring
+- **Mirror Button**: Appears in RotationPanel when Left/Right bone selected
+- **60+ Bone Pairs**: Arms, legs, fingers, eyes fully mapped
+- **Mirrors Both**: Bone rotation AND drag (parent quaternion)
+- **One-way Copy**: Source bone → opposite side with X-axis flip
+
 ### Bug Fixes
 - **VRM Version Detection**: Fixed to check `metaVersion === '1'` specifically
 - **DragPanel Close Button**: Added close button like RotationPanel
