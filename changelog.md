@@ -28,13 +28,20 @@
 - **Reset Rotation**: Orbit to front view (+Z), keep distance
 - **Reset All**: Reset position and rotation to defaults
 
-### Eye Direction Panel
-- **EyePanel.tsx**: New panel at bottom-left (next to DragPanel)
+### Eye Direction Panel (Hidden)
+- **EyePanel.tsx**: Hidden for now, functions preserved
 - **Horizontal Slider**: Control eye yaw (±90°)
 - **Vertical Slider**: Control eye pitch (±90°)
 - **Undo/Redo Support**: Eye direction saved in snapshot, syncs with history
-- **Purple Theme**: Consistent with other UI panels
-- **Reset Button**: Reset eyes to center (0°, 0°)
+
+### Camera Info Panel
+- **CameraInfoPanel.tsx**: New panel at bottom-left
+- **Position (X, Y, Z)**: Editable camera coordinates
+- **Spherical (Azimuth, Elevation, Distance)**: Editable orbit angles
+  - **Azimuth**: Horizontal orbit angle (0° = front)
+  - **Elevation**: Vertical orbit angle (0° = eye level)
+  - **Distance**: Distance from target
+- Edit values by clicking, typing, and pressing Enter
 
 ### Bug Fixes
 - **VRM Version Detection**: Fixed to check `metaVersion === '1'` specifically

@@ -41,6 +41,16 @@ interface AppState {
         resetAll?: () => void
     }
     setCameraResetCallbacks: (callbacks: AppState['cameraResetCallbacks']) => void
+    // Camera state (for info panel)
+    cameraState: {
+        position: { x: number; y: number; z: number }
+        spherical: { azimuth: number; elevation: number; distance: number }
+    }
+    setCameraState: (state: AppState['cameraState']) => void
+    applyCameraPosition?: (x: number, y: number, z: number) => void
+    setApplyCameraPosition: (fn: (x: number, y: number, z: number) => void) => void
+    applyCameraSpherical?: (azimuth: number, elevation: number, distance: number) => void
+    setApplyCameraSpherical: (fn: (azimuth: number, elevation: number, distance: number) => void) => void
     // History for undo/redo
     history: PoseSnapshot[]
     historyIndex: number
@@ -131,6 +141,13 @@ export const useStore = create<AppState>((set, get) => ({
     // Camera reset
     cameraResetCallbacks: {},
     setCameraResetCallbacks: (callbacks) => set({ cameraResetCallbacks: callbacks }),
+    // Camera state (for info panel)
+    cameraState: { position: { x: 0, y: 1.5, z: 2 }, spherical: { azimuth: 0, elevation: 0, distance: 2 } },
+    setCameraState: (state) => set({ cameraState: state }),
+    applyCameraPosition: undefined,
+    setApplyCameraPosition: (fn) => set({ applyCameraPosition: fn }),
+    applyCameraSpherical: undefined,
+    setApplyCameraSpherical: (fn: (azimuth: number, elevation: number, distance: number) => void) => set({ applyCameraSpherical: fn }),
     // History
     history: [],
     historyIndex: -1,

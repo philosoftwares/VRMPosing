@@ -1,4 +1,4 @@
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, Grid } from '@react-three/drei'
 import { VRMModel } from './VRMModel'
 import { BoneGizmo } from './BoneGizmo'
@@ -78,7 +78,59 @@ const CameraController = () => {
                 controls.update()
             }
         })
+
+        // Register camera position callback
+        useStore.getState().setApplyCameraPosition((x, y, z) => {
+            camera.position.set(x, y, z)
+            controls.update()
+        })
+
+        // Register camera spherical callback
+        useStore.getState().setApplyCameraSpherical((azimuth, elevation, distance) => {
+            // Convert spherical to cartesian (relative to target)
+            const azimuthRad = THREE.MathUtils.degToRad(azimuth)
+            const elevationRad = THREE.MathUtils.degToRad(elevation)
+
+            // Calculate camera position from spherical coordinates
+            const x = distance * Math.sin(azimuthRad) * Math.cos(elevationRad)
+            const y = distance * Math.sin(elevationRad)
+            const z = distance * Math.cos(azimuthRad) * Math.cos(elevationRad)
+
+            camera.position.set(
+                controls.target.x + x,
+                controls.target.y + y,
+                controls.target.z + z
+            )
+            controls.update()
+        })
     }, [camera, setCameraResetCallbacks])
+
+    // Sync camera state to store every frame
+    useFrame(() => {
+        const controls = controlsRef.current
+        if (!controls) return
+
+        // Calculate spherical coordinates from camera and target
+        const offset = new THREE.Vector3().subVectors(camera.position, controls.target)
+        const distance = offset.length()
+        const azimuth = THREE.MathUtils.radToDeg(Math.atan2(offset.x, offset.z))
+        const elevation = THREE.MathUtils.radToDeg(Math.asin(offset.y / distance))
+
+        useStore.setState({
+            cameraState: {
+                position: {
+                    x: camera.position.x,
+                    y: camera.position.y,
+                    z: camera.position.z
+                },
+                spherical: {
+                    azimuth,
+                    elevation,
+                    distance
+                }
+            }
+        })
+    })
 
     return (
         <OrbitControls
