@@ -45,7 +45,8 @@ export const DragPanel = () => {
 
     // Capture initial state when starting drag
     const captureInitialState = useCallback(() => {
-        if (selectedBoneName === 'Root' && vrm?.scene) {
+        // For Root and Hips: capture scene position
+        if ((selectedBoneName === 'Root' || selectedBoneName === VRMHumanBoneName.Hips) && vrm?.scene) {
             dragStartRef.current.scenePos = vrm.scene.position.clone()
             return
         }
@@ -94,13 +95,21 @@ export const DragPanel = () => {
         const sensitivity = 0.01
         const offset = sliderValue * sensitivity
 
-        // For Root bone: translate in local space
-        if (selectedBoneName === 'Root' && vrm?.scene && dragStartRef.current.scenePos) {
+        // For Root and Hips bone: translate in local space
+        if ((selectedBoneName === 'Root' || selectedBoneName === VRMHumanBoneName.Hips) && vrm?.scene && dragStartRef.current.scenePos) {
             const localAxis = axis === 'x' ? new THREE.Vector3(1, 0, 0) :
                 axis === 'y' ? new THREE.Vector3(0, 1, 0) :
                     new THREE.Vector3(0, 0, 1)
-            localAxis.applyQuaternion(vrm.scene.quaternion)
+            // For Hips, use the bone's world quaternion; for Root, use scene quaternion
+            if (selectedBoneName === VRMHumanBoneName.Hips && selectedBone) {
+                const boneWorldQuat = new THREE.Quaternion()
+                selectedBone.getWorldQuaternion(boneWorldQuat)
+                localAxis.applyQuaternion(boneWorldQuat)
+            } else {
+                localAxis.applyQuaternion(vrm.scene.quaternion)
+            }
             vrm.scene.position.copy(dragStartRef.current.scenePos).add(localAxis.multiplyScalar(offset))
+            vrm.scene.updateMatrixWorld(true)
             return
         }
 
@@ -126,6 +135,7 @@ export const DragPanel = () => {
 
         const targetPos = calc.boneWorldPos.clone().add(calc.localAxis.multiplyScalar(offset))
         applyDragToTarget(bone, targetPos)
+        vrm?.scene.updateMatrixWorld(true)
     }
 
     // Handle WORLD drag - move along world axes
@@ -135,12 +145,14 @@ export const DragPanel = () => {
         const sensitivity = 0.01
         const offset = sliderValue * sensitivity
 
-        if (selectedBoneName === 'Root' && vrm?.scene && dragStartRef.current.scenePos) {
+        // For Root and Hips bone: translate in world space
+        if ((selectedBoneName === 'Root' || selectedBoneName === VRMHumanBoneName.Hips) && vrm?.scene && dragStartRef.current.scenePos) {
             const newPos = dragStartRef.current.scenePos.clone()
             if (axis === 'x') newPos.x += offset
             else if (axis === 'y') newPos.y += offset
             else newPos.z += offset
             vrm.scene.position.copy(newPos)
+            vrm.scene.updateMatrixWorld(true)
             return
         }
 
@@ -161,6 +173,7 @@ export const DragPanel = () => {
         else targetPos.z += offset
 
         applyDragToTarget(bone, targetPos)
+        vrm?.scene.updateMatrixWorld(true)
     }
 
     if (!selectedBone || !selectedBoneName) return null

@@ -34,14 +34,11 @@
 - **Vertical Slider**: Control eye pitch (±90°)
 - **Undo/Redo Support**: Eye direction saved in snapshot, syncs with history
 
-### Camera Info Panel
-- **CameraInfoPanel.tsx**: New panel at bottom-left
+### Camera Panel (Unified)
+- **CameraPanel.tsx**: Merged CameraResetPanel + CameraInfoPanel into single component
+- **Reset Buttons**: Focus, Reset Pos, Reset Rot, Reset All (at bottom)
 - **Position (X, Y, Z)**: Editable camera coordinates
-- **Spherical (Azimuth, Elevation, Distance)**: Editable orbit angles
-  - **Azimuth**: Horizontal orbit angle (0° = front)
-  - **Elevation**: Vertical orbit angle (0° = eye level)
-  - **Distance**: Distance from target
-- Edit values by clicking, typing, and pressing Enter
+- **Orbit (Azimuth, Elevation, Distance)**: Editable spherical coordinates
 
 ### Bone Mirroring
 - **Mirror Button**: In RotationPanel, copies single bone to opposite side
@@ -55,6 +52,9 @@
 - **VRM Version Detection**: Fixed to check `metaVersion === '1'` specifically
 - **DragPanel Close Button**: Added close button like RotationPanel
 - **Eye Reset on Load**: Eye direction resets when loading new model
+- **Hips Bone Drag**: Now translates model like Root instead of rotating parent
+- **Bone Sphere Sync**: Added `updateMatrixWorld(true)` to keep spheres synced during drag
+- **Hips LOCAL Drag**: Uses Hips bone world quaternion for proper local orientation
 
 ---
 

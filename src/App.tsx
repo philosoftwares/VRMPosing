@@ -4,8 +4,7 @@ import { RotationPanel } from './components/ui/RotationPanel'
 import { ResetAllPanel } from './components/ui/ResetAllPanel'
 import { HistoryPanel } from './components/ui/HistoryPanel'
 import { DragPanel } from './components/ui/DragPanel'
-import { CameraResetPanel } from './components/ui/CameraResetPanel'
-import { CameraInfoPanel } from './components/ui/CameraInfoPanel'
+import { CameraPanel } from './components/ui/CameraPanel'
 // import { EyePanel } from './components/ui/EyePanel' // Hidden for now
 
 function App() {
@@ -13,9 +12,8 @@ function App() {
         <div className="w-full h-screen bg-gray-900 overflow-hidden relative">
             <Upload />
             <HistoryPanel />
-            <CameraInfoPanel />
+            <CameraPanel />
             {/* <EyePanel /> */}
-            <CameraResetPanel />
             <ResetAllPanel />
             <DragPanel />
             <RotationPanel />

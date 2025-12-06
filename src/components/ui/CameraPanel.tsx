@@ -1,9 +1,10 @@
 import { useStore } from '../../store/useStore'
 import { useState, useRef, useCallback, useEffect } from 'react'
 
-export const CameraInfoPanel = () => {
+export const CameraPanel = () => {
     const vrm = useStore((state) => state.vrm)
     const cameraState = useStore((state) => state.cameraState)
+    const cameraResetCallbacks = useStore((state) => state.cameraResetCallbacks)
     const applyCameraPosition = useStore((state) => state.applyCameraPosition)
     const applyCameraSpherical = useStore((state) => state.applyCameraSpherical)
 
@@ -118,7 +119,7 @@ export const CameraInfoPanel = () => {
             </div>
 
             {/* Orbit Angle */}
-            <div>
+            <div className="mb-3">
                 <p className="text-xs text-gray-400 mb-1">Orbit (°)</p>
                 <div className="flex gap-1 items-center text-xs">
                     <span className="text-gray-500 w-8">Az</span>
@@ -155,6 +156,38 @@ export const CameraInfoPanel = () => {
                         title="Distance from target"
                     />
                 </div>
+            </div>
+
+            {/* Reset Buttons */}
+            <div className="flex gap-1">
+                <button
+                    onClick={() => cameraResetCallbacks.focusToModel?.()}
+                    className="px-2 py-1.5 text-xs bg-green-700 hover:bg-green-600 text-white rounded"
+                    title="Focus camera on model (F)"
+                >
+                    Focus
+                </button>
+                <button
+                    onClick={() => cameraResetCallbacks.resetPosition?.()}
+                    className="px-2 py-1.5 text-xs bg-cyan-700 hover:bg-cyan-600 text-white rounded"
+                    title="Reset camera position to default"
+                >
+                    Reset Pos
+                </button>
+                <button
+                    onClick={() => cameraResetCallbacks.resetRotation?.()}
+                    className="px-2 py-1.5 text-xs bg-cyan-700 hover:bg-cyan-600 text-white rounded"
+                    title="Reset camera rotation to front view"
+                >
+                    Reset Rot
+                </button>
+                <button
+                    onClick={() => cameraResetCallbacks.resetAll?.()}
+                    className="px-2 py-1.5 text-xs bg-cyan-800 hover:bg-cyan-700 text-white rounded"
+                    title="Reset camera position and rotation"
+                >
+                    Reset All
+                </button>
             </div>
         </div>
     )

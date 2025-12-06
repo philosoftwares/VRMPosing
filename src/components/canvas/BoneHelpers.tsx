@@ -136,9 +136,16 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
         raycaster.ray.intersectPlane(dragPlaneRef.current, calc.targetPos)
         calc.targetPos.add(dragOffsetRef.current)
 
-        // Special handling for Root bone: TRANSLATE vrm.scene position instead of rotating
-        if (boneName === 'Root' && vrm?.scene) {
-            vrm.scene.position.copy(calc.targetPos)
+        // Special handling for Root and Hips bone: TRANSLATE vrm.scene position instead of rotating
+        if ((boneName === 'Root' || boneName === VRMHumanBoneName.Hips) && vrm?.scene) {
+            // Get current bone world position
+            bone.getWorldPosition(calc.boneWorldPos)
+            // Calculate offset from scene position to bone position
+            const offset = calc.boneWorldPos.clone().sub(vrm.scene.position)
+            // Move scene so that bone ends up at targetPos
+            vrm.scene.position.copy(calc.targetPos).sub(offset)
+            // Force update world matrices so bone spheres follow immediately
+            vrm.scene.updateMatrixWorld(true)
             return
         }
 
@@ -164,6 +171,11 @@ const BoneHelper = ({ bone, boneName, isMajor, isFinger, isHand, isSelected, onC
             bone.parent.quaternion.copy(calc.rotationQuat.premultiply(calc.grandparentWorldQuat))
         } else {
             bone.parent.quaternion.copy(calc.rotationQuat)
+        }
+
+        // Force update world matrices so bone spheres follow immediately
+        if (vrm?.scene) {
+            vrm.scene.updateMatrixWorld(true)
         }
     }, [isDragging, bone, boneName, vrm, camera, raycaster, pointer])
 
